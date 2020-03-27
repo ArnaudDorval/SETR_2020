@@ -207,6 +207,11 @@ int main(int argc, char* argv[])
     // Assuming arguments are valid, taking the total number of argc and subsracting optind gives the number of memory slots
     int nbrActifs = argc - optind;      // Après votre initialisation, cette variable DOIT contenir le nombre de flux vidéos actifs (de 1 à 4 inclusivement).
 
+    if (nbrActifs < 1 || nbrActifs > 4) {
+    	//TODO: Error
+    	return -1;
+    }
+
     // Creating the memory structures
     memPartage memStruct[nbrActifs];
 

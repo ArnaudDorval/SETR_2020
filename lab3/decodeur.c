@@ -190,7 +190,7 @@ int main(int argc, char* argv[]){
         //Now that we're done, free the mutex. 
         pthread_mutex_unlock(&memStructHeader->mutex);
         // Is there a better alternative ? 
-        while(memStruct->copieCompteur == memStructHeader->frameReader);
+        attenteEcrivain(memStruct);
     }
 
     return 0;

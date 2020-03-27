@@ -52,17 +52,17 @@ int initMemoirePartageeEcrivain(const char* identifiant,
 
 int attenteLecteur(struct memPartage *zone) {
 	while (zone->header->frameReader == zone->header->frameWriter);
-	return pthread_mutex_lock(&zone->header->mutex);
+	return 1; //pthread_mutex_lock(&zone->header->mutex);
 }
 
 int attenteLecteurAsync(struct memPartage *zone) {
 	if (zone->header->frameReader == zone->header->frameWriter) {
 		return -1;
 	}
-	return pthread_mutex_trylock(&zone->header->mutex);
+	return 1; //pthread_mutex_trylock(&zone->header->mutex);
 }
 
 int attenteEcrivain(struct memPartage *zone) {
-	// TODO
-	return pthread_mutex_trylock(&zone->header->mutex);
+	while(memStruct->copieCompteur == memStructHeader->frameReader);
+	return 1; //pthread_mutex_trylock(&zone->header->mutex);
 }
