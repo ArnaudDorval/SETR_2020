@@ -63,6 +63,6 @@ int attenteLecteurAsync(struct memPartage *zone) {
 }
 
 int attenteEcrivain(struct memPartage *zone) {
-	while(memStruct->copieCompteur == memStructHeader->frameReader);
+	while(zone->copieCompteur == zone->header->frameReader);
 	return 1; //pthread_mutex_trylock(&zone->header->mutex);
 }
