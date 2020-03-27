@@ -185,7 +185,37 @@ int main(int argc, char* argv[])
 {
     // TODO
     // ÉCRIVEZ ICI votre code d'analyse des arguments du programme et d'initialisation des zones mémoire partagées
-    int nbrActifs;      // Après votre initialisation, cette variable DOIT contenir le nombre de flux vidéos actifs (de 1 à 4 inclusivement).
+
+    int opt; 
+
+    // 1. Analyser parametres de la ligne de commande
+
+    while((opt = getopt(argc, argv, "s:d::")) != -1) {
+    	switch (opt) {
+    		case 's':
+
+    			break;
+    		case 'd':
+
+    			break;
+    		default:
+    			// TODO: Error here
+    			break;
+    	}
+    }
+
+    // Assuming arguments are valid, taking the total number of argc and subsracting optind gives the number of memory slots
+    int nbrActifs = argc - optind;      // Après votre initialisation, cette variable DOIT contenir le nombre de flux vidéos actifs (de 1 à 4 inclusivement).
+
+    // Creating the memory structures
+    memPartage memStruct[nbrActifs];
+
+    for (int i=0; i<nbrActifs; i++) {
+    	if (initMemoirePartageeLecteur(argc[optind++], &memStruct[i]) != 0) {
+    		//TODO: Error
+    		return -1; 
+    	}
+    }
 
     // Initialisation des structures nécessaires à l'affichage
     long int screensize = 0;
