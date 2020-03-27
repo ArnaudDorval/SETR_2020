@@ -1,0 +1,3 @@
+/home/setr/Bureau/lab2/laboratoire2/daemonFuse/build/CMakeFiles/rebuild_cache.dir
+/home/setr/Bureau/lab2/laboratoire2/daemonFuse/build/CMakeFiles/tp2client.dir
+/home/setr/Bureau/lab2/laboratoire2/daemonFuse/build/CMakeFiles/edit_cache.dir

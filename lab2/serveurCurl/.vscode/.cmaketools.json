@@ -1,0 +1,61 @@
+{
+  "variant": {
+    "label": "Debug",
+    "keywordSettings": {
+      "buildType": "debug"
+    },
+    "description": "Emit debug information without performing optimizations"
+  },
+  "activeEnvironments": [],
+  "codeModel": {
+    "configurations": [
+      {
+        "name": "Debug",
+        "projects": [
+          {
+            "buildDirectory": "/home/setr/projets/laboratoire2/serveurCurl/build",
+            "hasInstallRule": false,
+            "minimumCMakeVersion": "3.0",
+            "name": "SETR_TP2_SERVEUR",
+            "sourceDirectory": "/home/setr/projets/laboratoire2/serveurCurl",
+            "targets": [
+              {
+                "artifacts": [
+                  "/home/setr/projets/laboratoire2/serveurCurl/build/tp2serveur"
+                ],
+                "buildDirectory": "/home/setr/projets/laboratoire2/serveurCurl/build",
+                "fileGroups": [
+                  {
+                    "compileFlags": "-Wl,-rpath-link,/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot/opt/vc/lib -Wl,-rpath-link,/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot/lib/arm-linux-gnueabihf -Wl,-rpath-link,/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot/usr/lib/arm-linux-gnueabihf -Wl,-rpath-link,/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot/usr/local/lib -g   -Wall -Wextra -Wpedantic -Wduplicated-cond -Wlogical-op -Wnull-dereference -Wjump-misses-init -Wshadow -fno-omit-frame-pointer",
+                    "isGenerated": false,
+                    "language": "C",
+                    "sources": [
+                      "telechargeur.c",
+                      "requete.c",
+                      "actions.c",
+                      "servermain.c",
+                      "communications.c"
+                    ]
+                  }
+                ],
+                "fullName": "tp2serveur",
+                "isGeneratorProvided": false,
+                "linkFlags": "-rdynamic",
+                "linkLanguageFlags": "-Wl,-rpath-link,/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot/opt/vc/lib -Wl,-rpath-link,/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot/lib/arm-linux-gnueabihf -Wl,-rpath-link,/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot/usr/lib/arm-linux-gnueabihf -Wl,-rpath-link,/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot/usr/local/lib -g",
+                "linkLibraries": "-lcurl",
+                "linkerLanguage": "C",
+                "name": "tp2serveur",
+                "sourceDirectory": "/home/setr/projets/laboratoire2/serveurCurl",
+                "sysroot": "/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot",
+                "type": "EXECUTABLE"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "cookie": "0.7300332431302963",
+    "inReplyTo": "codemodel",
+    "type": "reply"
+  }
+}

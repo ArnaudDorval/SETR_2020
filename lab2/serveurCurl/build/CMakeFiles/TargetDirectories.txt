@@ -1,0 +1,3 @@
+/home/setr/projets/laboratoire2/serveurCurl/build/CMakeFiles/rebuild_cache.dir
+/home/setr/projets/laboratoire2/serveurCurl/build/CMakeFiles/tp2serveur.dir
+/home/setr/projets/laboratoire2/serveurCurl/build/CMakeFiles/edit_cache.dir
