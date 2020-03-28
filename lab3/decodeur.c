@@ -100,7 +100,7 @@ int main(int argc, char* argv[]){
     memcpy(&videoInfo.fps, videoMmap + 16, 4);
 
     // Get size of a single frame, used for initMemoirePartageeEcrivain
-    int frameSize = videoInfo.largeur * videoInfo.hauteur * videoInfo.canaux;
+    uint32_t frameSize = videoInfo.largeur * videoInfo.hauteur * videoInfo.canaux;
 
     memPartage* memStruct = (memPartage*)malloc(sizeof(memPartage));
     memPartageHeader* memStructHeader = (memPartageHeader*)malloc(sizeof(memPartageHeader));
@@ -138,34 +138,30 @@ int main(int argc, char* argv[]){
     int index = 20; 
 
     // Putting this outside loop to "save" time
-    int width, height, fps; 
-    width = (int)memStruct->header->largeur;
-    height = (int)memStruct->header->hauteur;
-    fps = (int)memStruct->header->fps;
+    int width, height, channels = 0; 
+    uint32_t currentFrame; 
 
-    while(1) {
-    	// 6.1 Lire une image a partir du fichier (aucune synchronisation necessaire)
-
+    while (1) {
     	// Get frame size
-    	memcpy(&frameSize, videoMmap + index, 4);
+    	memcpy(&currentFrame, videoMmap + index, 4);
         index += 4;
 
         //Checking if we're done. Must loop back if so.
-        if (frameSize == 0x00) {
+        if (currentFrame == 0x00) {
         	// We're done, must loop back. Ugly code, but easy code. 
-        	memcpy(&frameSize, videoMmap + 20, 4);
+        	memcpy(&currentFrame, videoMmap + 20, 4);
         	index = 24; 
         }
 
-    	// TODO: Check difference between actual_comps and real_comps ?
+        // TODO: Check difference between actual_comps and real_comps ?
     	unsigned char *frame = jpgd::decompress_jpeg_image_from_memory((const unsigned char*)(videoMmap+index),
-    													               frameSize,
+    													               currentFrame,
     													               &width,
     													               &height,
-    													               &fps,
+    													               &channels,
     													               memStruct->header->canaux);
 
-    	// 6.3 Ecrire l'image traitee sur la zone memoire de sortie (avec synchronisation)
+        // 6.3 Ecrire l'image traitee sur la zone memoire de sortie (avec synchronisation)
 
     	// Test to see if it works
         //printf("Current frame: height is %d, width is %d, fps is %d\n", height, width, fps);
@@ -181,8 +177,8 @@ int main(int argc, char* argv[]){
 
         memStruct->header->frameWriter++;
 
-        memcpy(&memStruct->data, frame, frameSize);
-        index += frameSize;
+        memcpy(memStruct->data, frame, frameSize);
+        index += currentFrame;
 
         tempsreel_free(frame);
 
@@ -193,6 +189,5 @@ int main(int argc, char* argv[]){
         // Is there a better alternative ? 
         attenteEcrivain(memStruct);
     }
-
     return 0;
 }
