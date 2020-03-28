@@ -10,9 +10,17 @@ int initMemoirePartageeLecteur(const char* identifiant,
 		return zone->fd;
 	}
 
-	//ftruncate(zone->fd, taille);
+	struct stat fdStat;
+	fstat(zone->fd, &fdStat);
 
-	// TODO
+	void* mmapData = mmap(NULL, fdStat.st_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, zone->fd, 0);
+	memPartageHeader* mmapHeader = (memPartageHeader*) mmapData;
+
+	zone->header = mmapHeader;
+	zone->tailleDonnees = fdStat.st_size - sizeof(memPartageHeader);
+	zone->data = ((unsigned char*)mmapData) + sizeof(memPartageHeader);
+	zone->copieCompteur = 0;
+
 	return 0;
 }
 
