@@ -139,9 +139,9 @@ int main(int argc, char* argv[]){
 
     // Putting this outside loop to "save" time
     int width, height, fps; 
-    width = (int)memStructHeader->largeur;
-    height = (int)memStructHeader->hauteur;
-    fps = (int)memStructHeader->fps;
+    width = (int)memStruct->header->largeur;
+    height = (int)memStruct->header->hauteur;
+    fps = (int)memStruct->header->fps;
 
     while(1) {
     	// 6.1 Lire une image a partir du fichier (aucune synchronisation necessaire)
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]){
     													               &width,
     													               &height,
     													               &fps,
-    													               memStructHeader->canaux);
+    													               memStruct->header->canaux);
 
     	// 6.3 Ecrire l'image traitee sur la zone memoire de sortie (avec synchronisation)
 

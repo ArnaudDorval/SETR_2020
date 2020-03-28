@@ -89,6 +89,7 @@ int attenteLecteur(struct memPartage *zone) {
 }
 
 int attenteLecteurAsync(struct memPartage *zone) {
+	//printf("frameRead is %d and frameWriter is %d\n", zone->header->frameReader, zone->header->frameWriter);
 	if (zone->header->frameReader == zone->header->frameWriter) {
 		return -1;
 	}
