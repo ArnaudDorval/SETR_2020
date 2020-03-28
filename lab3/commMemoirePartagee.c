@@ -3,15 +3,19 @@
 int initMemoirePartageeLecteur(const char* identifiant,
                                 struct memPartage *zone) {
 	
-	zone->fd = shm_open(identifiant, O_RDWR, 777);
+	// 2.1 Ouvrir la zone memoire correspondante et attendre qu'elle soit prete. 
 
+	zone->fd = shm_open(identifiant, O_RDWR, 777);
 	if (zone->fd < 0) {
 		// TODO: Error while opening memory file
 		return zone->fd;
 	}
 
 	struct stat fdStat;
-	fstat(zone->fd, &fdStat);
+	
+	do {
+		fstat(zone->fd, &fdStat);
+	} while(fdStat.st_size == 0);
 
 	void* mmapData = mmap(NULL, fdStat.st_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, zone->fd, 0);
 	if (mmapData == MAP_FAILED) {
