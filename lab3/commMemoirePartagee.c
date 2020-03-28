@@ -21,6 +21,8 @@ int initMemoirePartageeEcrivain(const char* identifiant,
                                 size_t taille,
                                 struct memPartageHeader* headerInfos) {
 
+	size_t memorySpace = sizeof(memPartageHeader) + taille;
+
 	zone->fd = shm_open(identifiant, O_RDWR | O_CREAT, 777);
 
 	if (zone->fd < 0) {
@@ -28,19 +30,22 @@ int initMemoirePartageeEcrivain(const char* identifiant,
 		return zone->fd;
 	}
 
-	if (ftruncate(zone->fd, taille) < 0) {
+	if (ftruncate(zone->fd, memorySpace) < 0) {
 		printf("Error using ftruncate.\n");
 		return -1;
 	}
 
-	zone->data = (unsigned char*)mmap(NULL, taille, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, zone->fd, 0);
-	
-	if (zone->data == MAP_FAILED) {
+	void* mmapData = mmap(NULL, memorySpace, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, zone->fd, 0);
+	if (mmapData == MAP_FAILED) {
 		printf("Error creating mmap.\n");
 		return -1;
 	}
 
-	zone->header = headerInfos;
+	memPartageHeader* mmapHeader = (memPartageHeader*)mmapData;
+	mmapHeader = headerInfos;
+	
+	zone->data = ((unsigned char*)mmapData)+sizeof(memPartageHeader);
+	zone->header = mmapHeader;
 	zone->tailleDonnees = taille;
 	zone->copieCompteur = 0;
 

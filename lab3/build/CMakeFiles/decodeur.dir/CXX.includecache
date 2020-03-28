@@ -6,11 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.c
-allocateurMemoire.h
-/home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.h
-
-/home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.h
+/home/setr/projets/SETR_2020/lab3/allocateurMemoire.h
 stdio.h
 -
 stdlib.h
@@ -24,11 +20,7 @@ errno.h
 sys/mman.h
 -
 
-/home/setr/Bureau/lab3/laboratoire3/commMemoirePartagee.c
-commMemoirePartagee.h
-/home/setr/Bureau/lab3/laboratoire3/commMemoirePartagee.h
-
-/home/setr/Bureau/lab3/laboratoire3/commMemoirePartagee.h
+/home/setr/projets/SETR_2020/lab3/commMemoirePartagee.h
 stdint.h
 -
 sys/mman.h
@@ -50,33 +42,23 @@ pthread.h
 string.h
 -
 
-/home/setr/Bureau/lab3/laboratoire3/decodeur.c
+/home/setr/projets/SETR_2020/lab3/decodeur.c
 sys/resource.h
 -
 sched.h
 -
 schedsupp.h
-/home/setr/Bureau/lab3/laboratoire3/schedsupp.h
+/home/setr/projets/SETR_2020/lab3/schedsupp.h
 allocateurMemoire.h
-/home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.h
+/home/setr/projets/SETR_2020/lab3/allocateurMemoire.h
 commMemoirePartagee.h
-/home/setr/Bureau/lab3/laboratoire3/commMemoirePartagee.h
+/home/setr/projets/SETR_2020/lab3/commMemoirePartagee.h
 utils.h
-/home/setr/Bureau/lab3/laboratoire3/utils.h
+/home/setr/projets/SETR_2020/lab3/utils.h
 jpgd.h
-/home/setr/Bureau/lab3/laboratoire3/jpgd.h
+/home/setr/projets/SETR_2020/lab3/jpgd.h
 
-/home/setr/Bureau/lab3/laboratoire3/jpgd.cpp
-jpgd.h
-/home/setr/Bureau/lab3/laboratoire3/jpgd.h
-allocateurMemoire.h
-/home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.h
-string.h
--
-assert.h
--
-
-/home/setr/Bureau/lab3/laboratoire3/jpgd.h
+/home/setr/projets/SETR_2020/lab3/jpgd.h
 stdlib.h
 -
 stdio.h
@@ -84,7 +66,7 @@ stdio.h
 setjmp.h
 -
 
-/home/setr/Bureau/lab3/laboratoire3/schedsupp.h
+/home/setr/projets/SETR_2020/lab3/schedsupp.h
 linux/kernel.h
 -
 unistd.h
@@ -102,11 +84,7 @@ linux/sched.h
 sys/types.h
 -
 
-/home/setr/Bureau/lab3/laboratoire3/utils.c
-utils.h
-/home/setr/Bureau/lab3/laboratoire3/utils.h
-
-/home/setr/Bureau/lab3/laboratoire3/utils.h
+/home/setr/projets/SETR_2020/lab3/utils.h
 stdio.h
 -
 math.h
@@ -114,5 +92,5 @@ math.h
 string.h
 -
 allocateurMemoire.h
-/home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.h
+/home/setr/projets/SETR_2020/lab3/allocateurMemoire.h
 

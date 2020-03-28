@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/setr/Bureau/lab3/laboratoire3
+CMAKE_SOURCE_DIR = /home/setr/projets/SETR_2020/lab3
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/setr/Bureau/lab3/laboratoire3/build
+CMAKE_BINARY_DIR = /home/setr/projets/SETR_2020/lab3/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/convertisseur.dir/depend.make
@@ -59,55 +59,55 @@ include CMakeFiles/convertisseur.dir/flags.make
 
 CMakeFiles/convertisseur.dir/allocateurMemoire.c.o: CMakeFiles/convertisseur.dir/flags.make
 CMakeFiles/convertisseur.dir/allocateurMemoire.c.o: ../allocateurMemoire.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/setr/Bureau/lab3/laboratoire3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/convertisseur.dir/allocateurMemoire.c.o"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/convertisseur.dir/allocateurMemoire.c.o -c /home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/setr/projets/SETR_2020/lab3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/convertisseur.dir/allocateurMemoire.c.o"
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/convertisseur.dir/allocateurMemoire.c.o -c /home/setr/projets/SETR_2020/lab3/allocateurMemoire.c
 
 CMakeFiles/convertisseur.dir/allocateurMemoire.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/convertisseur.dir/allocateurMemoire.c.i"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.c > CMakeFiles/convertisseur.dir/allocateurMemoire.c.i
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/setr/projets/SETR_2020/lab3/allocateurMemoire.c > CMakeFiles/convertisseur.dir/allocateurMemoire.c.i
 
 CMakeFiles/convertisseur.dir/allocateurMemoire.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/convertisseur.dir/allocateurMemoire.c.s"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/setr/Bureau/lab3/laboratoire3/allocateurMemoire.c -o CMakeFiles/convertisseur.dir/allocateurMemoire.c.s
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/setr/projets/SETR_2020/lab3/allocateurMemoire.c -o CMakeFiles/convertisseur.dir/allocateurMemoire.c.s
 
 CMakeFiles/convertisseur.dir/commMemoirePartagee.c.o: CMakeFiles/convertisseur.dir/flags.make
 CMakeFiles/convertisseur.dir/commMemoirePartagee.c.o: ../commMemoirePartagee.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/setr/Bureau/lab3/laboratoire3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/convertisseur.dir/commMemoirePartagee.c.o"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/convertisseur.dir/commMemoirePartagee.c.o -c /home/setr/Bureau/lab3/laboratoire3/commMemoirePartagee.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/setr/projets/SETR_2020/lab3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/convertisseur.dir/commMemoirePartagee.c.o"
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/convertisseur.dir/commMemoirePartagee.c.o -c /home/setr/projets/SETR_2020/lab3/commMemoirePartagee.c
 
 CMakeFiles/convertisseur.dir/commMemoirePartagee.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/convertisseur.dir/commMemoirePartagee.c.i"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/setr/Bureau/lab3/laboratoire3/commMemoirePartagee.c > CMakeFiles/convertisseur.dir/commMemoirePartagee.c.i
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/setr/projets/SETR_2020/lab3/commMemoirePartagee.c > CMakeFiles/convertisseur.dir/commMemoirePartagee.c.i
 
 CMakeFiles/convertisseur.dir/commMemoirePartagee.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/convertisseur.dir/commMemoirePartagee.c.s"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/setr/Bureau/lab3/laboratoire3/commMemoirePartagee.c -o CMakeFiles/convertisseur.dir/commMemoirePartagee.c.s
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/setr/projets/SETR_2020/lab3/commMemoirePartagee.c -o CMakeFiles/convertisseur.dir/commMemoirePartagee.c.s
 
 CMakeFiles/convertisseur.dir/utils.c.o: CMakeFiles/convertisseur.dir/flags.make
 CMakeFiles/convertisseur.dir/utils.c.o: ../utils.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/setr/Bureau/lab3/laboratoire3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/convertisseur.dir/utils.c.o"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/convertisseur.dir/utils.c.o -c /home/setr/Bureau/lab3/laboratoire3/utils.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/setr/projets/SETR_2020/lab3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/convertisseur.dir/utils.c.o"
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/convertisseur.dir/utils.c.o -c /home/setr/projets/SETR_2020/lab3/utils.c
 
 CMakeFiles/convertisseur.dir/utils.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/convertisseur.dir/utils.c.i"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/setr/Bureau/lab3/laboratoire3/utils.c > CMakeFiles/convertisseur.dir/utils.c.i
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/setr/projets/SETR_2020/lab3/utils.c > CMakeFiles/convertisseur.dir/utils.c.i
 
 CMakeFiles/convertisseur.dir/utils.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/convertisseur.dir/utils.c.s"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/setr/Bureau/lab3/laboratoire3/utils.c -o CMakeFiles/convertisseur.dir/utils.c.s
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/setr/projets/SETR_2020/lab3/utils.c -o CMakeFiles/convertisseur.dir/utils.c.s
 
 CMakeFiles/convertisseur.dir/convertisseurgris.c.o: CMakeFiles/convertisseur.dir/flags.make
 CMakeFiles/convertisseur.dir/convertisseurgris.c.o: ../convertisseurgris.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/setr/Bureau/lab3/laboratoire3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/convertisseur.dir/convertisseurgris.c.o"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/convertisseur.dir/convertisseurgris.c.o -c /home/setr/Bureau/lab3/laboratoire3/convertisseurgris.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/setr/projets/SETR_2020/lab3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/convertisseur.dir/convertisseurgris.c.o"
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/convertisseur.dir/convertisseurgris.c.o -c /home/setr/projets/SETR_2020/lab3/convertisseurgris.c
 
 CMakeFiles/convertisseur.dir/convertisseurgris.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/convertisseur.dir/convertisseurgris.c.i"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/setr/Bureau/lab3/laboratoire3/convertisseurgris.c > CMakeFiles/convertisseur.dir/convertisseurgris.c.i
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/setr/projets/SETR_2020/lab3/convertisseurgris.c > CMakeFiles/convertisseur.dir/convertisseurgris.c.i
 
 CMakeFiles/convertisseur.dir/convertisseurgris.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/convertisseur.dir/convertisseurgris.c.s"
-	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/setr/Bureau/lab3/laboratoire3/convertisseurgris.c -o CMakeFiles/convertisseur.dir/convertisseurgris.c.s
+	/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/bin/arm-raspbian-linux-gnueabihf-g++ --sysroot=/home/setr/arm-cross-comp-env/arm-raspbian-linux-gnueabihf/arm-raspbian-linux-gnueabihf/sysroot $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/setr/projets/SETR_2020/lab3/convertisseurgris.c -o CMakeFiles/convertisseur.dir/convertisseurgris.c.s
 
 # Object files for target convertisseur
 convertisseur_OBJECTS = \
@@ -125,7 +125,7 @@ convertisseur: CMakeFiles/convertisseur.dir/utils.c.o
 convertisseur: CMakeFiles/convertisseur.dir/convertisseurgris.c.o
 convertisseur: CMakeFiles/convertisseur.dir/build.make
 convertisseur: CMakeFiles/convertisseur.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/setr/Bureau/lab3/laboratoire3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable convertisseur"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/setr/projets/SETR_2020/lab3/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable convertisseur"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/convertisseur.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -138,6 +138,6 @@ CMakeFiles/convertisseur.dir/clean:
 .PHONY : CMakeFiles/convertisseur.dir/clean
 
 CMakeFiles/convertisseur.dir/depend:
-	cd /home/setr/Bureau/lab3/laboratoire3/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/setr/Bureau/lab3/laboratoire3 /home/setr/Bureau/lab3/laboratoire3 /home/setr/Bureau/lab3/laboratoire3/build /home/setr/Bureau/lab3/laboratoire3/build /home/setr/Bureau/lab3/laboratoire3/build/CMakeFiles/convertisseur.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/setr/projets/SETR_2020/lab3/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/setr/projets/SETR_2020/lab3 /home/setr/projets/SETR_2020/lab3 /home/setr/projets/SETR_2020/lab3/build /home/setr/projets/SETR_2020/lab3/build /home/setr/projets/SETR_2020/lab3/build/CMakeFiles/convertisseur.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/convertisseur.dir/depend
 
