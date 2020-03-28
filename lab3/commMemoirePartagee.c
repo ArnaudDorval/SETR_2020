@@ -14,6 +14,11 @@ int initMemoirePartageeLecteur(const char* identifiant,
 	fstat(zone->fd, &fdStat);
 
 	void* mmapData = mmap(NULL, fdStat.st_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, zone->fd, 0);
+	if (mmapData == MAP_FAILED) {
+		printf("Error creating mmap.\n");
+		return -1;
+	}
+
 	memPartageHeader* mmapHeader = (memPartageHeader*) mmapData;
 
 	zone->header = mmapHeader;
