@@ -141,7 +141,7 @@ int main(int argc, char* argv[]){
     int width, height, fps; 
     width = (int)memStructHeader->largeur;
     height = (int)memStructHeader->hauteur;
-    fps = (int)memStructHeader->canaux;
+    fps = (int)memStructHeader->fps;
 
     while(1) {
     	// 6.1 Lire une image a partir du fichier (aucune synchronisation necessaire)
@@ -177,19 +177,19 @@ int main(int argc, char* argv[]){
         //break;
 
         // Do we need the mutex before ?
-        pthread_mutex_lock(&memStructHeader->mutex);
+        pthread_mutex_lock(&memStruct->header->mutex);
 
-        memStructHeader->frameWriter++;
+        memStruct->header->frameWriter++;
 
         memcpy(&memStruct->data, frame, frameSize);
         index += frameSize;
 
         tempsreel_free(frame);
 
-        memStruct->copieCompteur = memStructHeader->frameReader;
+        memStruct->copieCompteur = memStruct->header->frameReader;
 
         //Now that we're done, free the mutex. 
-        pthread_mutex_unlock(&memStructHeader->mutex);
+        pthread_mutex_unlock(&memStruct->header->mutex);
         // Is there a better alternative ? 
         attenteEcrivain(memStruct);
     }

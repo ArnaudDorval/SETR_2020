@@ -61,6 +61,7 @@
 #include "commMemoirePartagee.h"
 #include "utils.h"
 
+#include "jpgd.h"
 
 // Fonction permettant de récupérer le temps courant sous forme double
 double get_time()
@@ -208,8 +209,8 @@ int main(int argc, char* argv[])
 
     // Assuming arguments are valid, taking the total number of argc and subsracting optind gives the number of memory slots
 	int nbrActifs = argc - optind;      // Après votre initialisation, cette variable DOIT contenir le nombre de flux vidéos actifs (de 1 à 4 inclusivement).
-
-    if (nbrActifs < 1 || nbrActifs > 4) {
+	
+	if (nbrActifs < 1 || nbrActifs > 4) {
     	//TODO: Error
     	return -1;
     }
@@ -218,7 +219,7 @@ int main(int argc, char* argv[])
     memPartage memStruct[4];
 
     // Get max memory size required at same time, gonna save a loop.
-    st_size maxMemorySize = 0;
+    unsigned int maxMemorySize = 0;
     for (int i=0; i<nbrActifs; i++) {
     	if (initMemoirePartageeLecteur(argv[optind++], &memStruct[i]) != 0) {
     		//TODO: Error
@@ -299,7 +300,6 @@ int main(int argc, char* argv[])
 		return -1;
     }
 
-
     while(1){
             // Boucle principale du programme
             // TODO
@@ -333,7 +333,7 @@ int main(int argc, char* argv[])
 
     		//TODO: Pour chaque source, si temps ecoule depuis dernier affichage > 1fps.
 
-    		if (attenteLecteurAsync(memStruct[i]) != 0) {
+    		if (attenteLecteurAsync(&memStruct[i]) != 0) {
     			continue; 
     		}
 

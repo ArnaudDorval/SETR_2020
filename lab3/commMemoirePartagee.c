@@ -61,15 +61,24 @@ int initMemoirePartageeEcrivain(const char* identifiant,
 	}
 
 	memPartageHeader* mmapHeader = (memPartageHeader*)mmapData;
-	mmapHeader = headerInfos;
+	mmapHeader->mutex = headerInfos->mutex;
+	mmapHeader->frameWriter = headerInfos->frameWriter;
+	mmapHeader->frameReader = headerInfos->frameReader;
+	mmapHeader->largeur = headerInfos->largeur;
+	mmapHeader->hauteur = headerInfos->hauteur;
+	mmapHeader->canaux = headerInfos->canaux;
+	mmapHeader->fps = headerInfos->fps;
 	
 	zone->data = ((unsigned char*)mmapData)+sizeof(memPartageHeader);
 	zone->header = mmapHeader;
 	zone->tailleDonnees = taille;
 	zone->copieCompteur = 0;
 
-	pthread_mutex_init(&zone->header->mutex, NULL);
-	//pthread_mutexattr_setpshared(&zone->header->mutex, PTHREAD_PROCESS_SHARED);
+	pthread_mutexattr_t attr; 
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+	
+	pthread_mutex_init(&mmapHeader->mutex, &attr);
 
 	return 0;
 }
