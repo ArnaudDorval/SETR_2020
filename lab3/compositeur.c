@@ -204,6 +204,8 @@ int main(int argc, char* argv[])
     	}
     }
 
+    // 2. Initialiser LES zoneS memoires d'entree (une initialisation par flux, selon ligne de commande); pour chaque flux d'entree.
+
     // Assuming arguments are valid, taking the total number of argc and subsracting optind gives the number of memory slots
 	int nbrActifs = argc - optind;      // Après votre initialisation, cette variable DOIT contenir le nombre de flux vidéos actifs (de 1 à 4 inclusivement).
 
@@ -212,15 +214,28 @@ int main(int argc, char* argv[])
     	return -1;
     }
 
-    // Creating the memory structures
+    // Creating the memory structures, hardcoded 4 as that is the max allowed. 
     memPartage memStruct[4];
 
+    // Get max memory size required at same time, gonna save a loop.
+    st_size maxMemorySize = 0;
     for (int i=0; i<nbrActifs; i++) {
     	if (initMemoirePartageeLecteur(argv[optind++], &memStruct[i]) != 0) {
     		//TODO: Error
     		return -1; 
     	}
+    	if (memStruct[i].tailleDonnees > maxMemorySize) {
+    		maxMemorySize = memStruct[i].tailleDonnees;
+    	}
     }
+
+    // 4. Initialiser l'alocateur memoire et fixer les zones alloues (mlock).
+
+    prepareMemoire(maxMemorySize, 0);
+
+    // 5. Ajuster les parametres de l'ordonnanceur
+
+    // TODO
 
     // Initialisation des structures nécessaires à l'affichage
     long int screensize = 0;
@@ -313,6 +328,32 @@ int main(int argc, char* argv[])
                         A_REMPLIR_LARGEUR_DE_LA_TRAME,
                         A_REMPLIR_HAUTEUR_DE_LA_TRAME,
                         A_REMPLIR_NOMBRECANAUX_DANS_LA_TRAME); */
+
+    	for (int i=0; i < nbrActifs; i++) {
+
+    		//TODO: Pour chaque source, si temps ecoule depuis dernier affichage > 1fps.
+
+    		if (attenteLecteurAsync(memStruct[i]) != 0) {
+    			continue; 
+    		}
+
+    		ecrireImage(i, 
+                        nbrActifs, 
+                        fbfd, 
+                        fbp, 
+                        vinfo.xres, 
+                        vinfo.yres, 
+                        &vinfo, 
+                        finfo.line_length,
+                        memStruct[i].data,
+                        memStruct[i].header->largeur,
+                        memStruct[i].header->hauteur,
+                        memStruct[i].header->canaux);
+    	
+    	memStruct[i].header->frameReader += 1;
+
+    	pthread_mutex_unlock(&memStruct[i].header->mutex);
+    	}
     }
 
 

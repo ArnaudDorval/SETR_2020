@@ -137,6 +137,12 @@ int main(int argc, char* argv[]){
     // start at 20 because this is where the first image data is. 
     int index = 20; 
 
+    // Putting this outside loop to "save" time
+    int width, height, fps; 
+    width = (int)memStructHeader->largeur;
+    height = (int)memStructHeader->hauteur;
+    fps = (int)memStructHeader->canaux;
+
     while(1) {
     	// 6.1 Lire une image a partir du fichier (aucune synchronisation necessaire)
 
@@ -150,11 +156,6 @@ int main(int argc, char* argv[]){
         	memcpy(&frameSize, videoMmap + 20, 4);
         	index = 24; 
         }
-
-        int width, height, fps; 
-        width = (int)memStructHeader->largeur;
-        height = (int)memStructHeader->hauteur;
-        fps = (int)memStructHeader->canaux;
 
     	// TODO: Check difference between actual_comps and real_comps ?
     	unsigned char *frame = jpgd::decompress_jpeg_image_from_memory((const unsigned char*)(videoMmap+index),

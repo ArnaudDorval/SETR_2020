@@ -23,6 +23,8 @@ int initMemoirePartageeLecteur(const char* identifiant,
 		return -1;
 	}
 
+	// 2.2 Recuperer les informations sur le flux d'entree.
+
 	memPartageHeader* mmapHeader = (memPartageHeader*) mmapData;
 
 	zone->header = mmapHeader;
@@ -81,10 +83,10 @@ int attenteLecteurAsync(struct memPartage *zone) {
 	if (zone->header->frameReader == zone->header->frameWriter) {
 		return -1;
 	}
-	return 1; //pthread_mutex_trylock(&zone->header->mutex);
+	return pthread_mutex_trylock(&zone->header->mutex);
 }
 
 int attenteEcrivain(struct memPartage *zone) {
 	while(zone->copieCompteur == zone->header->frameReader);
-	return 1; //pthread_mutex_trylock(&zone->header->mutex);
+	return 1; //pthread_mutex_lock(&zone->header->mutex);
 }
