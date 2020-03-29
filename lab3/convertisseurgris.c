@@ -19,11 +19,28 @@ int main(int argc, char* argv[]){
     // fonction convertToGray de utils.c. Votre code doit lire une image depuis une zone mémoire 
     // partagée et envoyer le résultat sur une autre zone mémoire partagée.
     // N'oubliez pas de respecter la syntaxe de la ligne de commande présentée dans l'énoncé.
-    int opt, sched_policy;
-    uint32_t hauteur, largeur;
-    uint32_t canaux = 1;
-    char espaceLecture[30] = "";
-    char espaceEcriture[30] = "";
+    int opt;
+
+    uint32_t height;
+    uint32_t width;
+    uint32_t channel = 1;
+
+    size_t sizeInput;
+    size_t sizeOutput;
+
+    char readSpace[30] = "";
+    char writeSpace[30] = "";
+
+    struct memPartage readZone ;
+    struct memPartage writeZone;
+    struct memPartageHeader writeHeader;
+
+    int sched_policy;
+    struct sched_attr attr ; 
+
+    /**
+     * Section pour parse la commande 
+     **/
     while(1){
 		static struct option long_options[] =
 		{
@@ -32,48 +49,44 @@ int main(int argc, char* argv[]){
 		};
 		int option_index;
 
-		opt = getopt_long(argc, argv, "s:d:", long_options, &option_index);
+		opt = getopt_long(argc, argv, "", long_options, &option_index);
 		if(opt == -1) {
 				break;
 		}
 		switch(opt){
-            case 's' :
+            case '?' :
                 break;
-            case 'd' : 
-                break;
+
 		}
 	}
     if(debug_flag){
-        strcpy(espaceLecture, "/mem1") ;
-        strcpy(espaceEcriture, "/mem2");
+        strcpy(readSpace, "/mem1") ;
+        strcpy(writeSpace, "/mem2");
     }
     else{
-        strcpy(espaceLecture, argv[argc-2]);
-        strcpy(espaceEcriture, argv[argc-1]) ;
+        strcpy(readSpace, argv[argc-2]);
+        strcpy(writeSpace, argv[argc-1]) ;
     }
 
-    
-    struct memPartage zone_lecteur ;
-    initMemoirePartageeLecteur(espaceLecture, &zone_lecteur);
-    struct memPartage zone_ecrivain;
-    struct memPartageHeader zone_header_ecrivain;
 
-    zone_header_ecrivain.frameReader = 0 ;
-    zone_header_ecrivain.frameWriter = 0 ;
-    zone_header_ecrivain.largeur = zone_lecteur.header->largeur ; 
-    zone_header_ecrivain.hauteur = zone_lecteur.header->hauteur;
-    zone_header_ecrivain.fps = zone_lecteur.header->fps ; 
-    zone_header_ecrivain.canaux = canaux;
-    hauteur = zone_lecteur.header->hauteur;
-    largeur = zone_lecteur.header->largeur;
-    
-    size_t tailleImageEntree, tailleImageSortie;
-    tailleImageEntree = zone_lecteur.header->canaux * hauteur * largeur;
-    tailleImageSortie = hauteur*largeur;
-    initMemoirePartageeEcrivain(espaceEcriture, &zone_ecrivain, tailleImageSortie, &zone_header_ecrivain);
-    prepareMemoire(tailleImageEntree, 0);
+    initMemoirePartageeLecteur(readSpace, &readZone);
 
-    struct sched_attr attr ; 
+    writeHeader.frameReader = 0 ;
+    writeHeader.frameWriter = 0 ;
+    writeHeader.largeur = readZone.header->largeur ; 
+    writeHeader.hauteur = readZone.header->hauteur;
+    writeHeader.fps = readZone.header->fps ; 
+    writeHeader.canaux = channel;
+
+    height = readZone.header->hauteur;
+    width = readZone.header->largeur;
+    
+    sizeInput = readZone.header->canaux * height * width;
+    sizeOutput = height * width;
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, sizeOutput, &writeHeader);
+    prepareMemoire(sizeInput, 0);
+
+    
     attr.size = sizeof(attr);
     attr.sched_flags = 0 ;
     attr.sched_policy = sched_policy;
@@ -97,21 +110,21 @@ int main(int argc, char* argv[]){
     
     while(1){
 
-        convertToGray(zone_lecteur.data, 
-                hauteur, 
-                largeur,
+        convertToGray(readZone.data, 
+                height, 
+                width,
                 3,
-                zone_ecrivain.data);
+                writeZone.data);
 
 
 
-        zone_lecteur.header->frameReader++;
-        pthread_mutex_unlock(&(zone_lecteur.header->mutex)) ;
-        attenteLecteur(&zone_lecteur) ;
+        readZone.header->frameReader++;
+        pthread_mutex_unlock(&(readZone.header->mutex)) ;
+        attenteLecteur(&readZone) ;
         
-        zone_ecrivain.header->frameWriter++;
-        pthread_mutex_unlock(&(zone_ecrivain.header->mutex)) ;
-        attenteEcrivain(&zone_ecrivain) ;
+        writeZone.header->frameWriter++;
+        pthread_mutex_unlock(&(writeZone.header->mutex)) ;
+        attenteEcrivain(&writeZone) ;
 
     }
 
