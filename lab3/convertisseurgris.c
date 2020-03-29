@@ -28,8 +28,8 @@ int main(int argc, char* argv[]){
     size_t sizeInput;
     size_t sizeOutput;
 
-    char readSpace[30] = "";
-    char writeSpace[30] = "";
+    char readSpace[100] = "";
+    char writeSpace[100] = "";
 
     struct memPartage readZone ;
     struct memPartage writeZone;
@@ -55,8 +55,10 @@ int main(int argc, char* argv[]){
 		}
 		switch(opt){
             case 's':
+                printf("option s '%s' \n", optarg);
                 break;
             case 'd':
+                printf("option d '%s' \n", optarg);
                 break;
             default:
                 printf("convertisseur bad request");

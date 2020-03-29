@@ -21,8 +21,8 @@ int main(int argc, char* argv[]){
     // N'oubliez pas de respecter la syntaxe de la ligne de commande présentée dans l'énoncé.
     int opt;
     
-    char readSpace[30] = "";
-    char writeSpace[30] = "";
+    char readSpace[100] = "";
+    char writeSpace[100] = "";
     uint32_t channel = 0;
     uint32_t heightInput = 0;
     uint32_t widthInput = 0;
@@ -56,16 +56,21 @@ int main(int argc, char* argv[]){
 		}
 		switch(opt){
             case 's':
+                printf("option s '%s' \n", optarg);
                 break;
             case 'd':
+                printf("option d '%s' \n", optarg);
                 break;
             case 'w' :
+                printf("option w '%s' \n", optarg);
                 widthOutput = atoi(optarg);
                 break;
             case 'h' :
+                printf("option h '%s' \n", optarg);
                 heightOutput = atoi(optarg);
                 break;
             case 'm' :
+                printf("option m '%s' \n", optarg);
                 resizeType = atoi(optarg);
                 break;
             default:
@@ -108,13 +113,15 @@ int main(int argc, char* argv[]){
     sizeInput = channel * heightInput * widthInput;
     sizeOutput = channel * heightOutput * widthOutput;
 
+    size_t outP= sizeOutput + sizeof(struct memPartageHeader);
     if(sizeInput > sizeOutput){
         sizeScale = sizeInput;
     }else{
         sizeScale = sizeOutput;
     }
 
-    initMemoirePartageeEcrivain(writeSpace, &writeZone, sizeOutput, &writeHeader);
+
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, outP, &writeHeader);
     prepareMemoire(sizeScale, 0);
 
     attr.size = sizeof(attr);
@@ -138,6 +145,7 @@ int main(int argc, char* argv[]){
             break ;
     }
 
+    pthread_mutex_lock(&(writeZone.header->mutex));
     ResizeGrid grid;
 
     if(resizeType){

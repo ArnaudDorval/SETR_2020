@@ -21,8 +21,8 @@ int main(int argc, char* argv[]){
     int filterType = 0;
     int opt;
     
-    char readSpace[30] = "";
-    char writeSpace[30] = "";
+    char readSpace[100] = "";
+    char writeSpace[100] = "";
     uint32_t channel = 0;
     uint32_t heightInput = 0;
     uint32_t widthInput = 0;
@@ -53,10 +53,13 @@ int main(int argc, char* argv[]){
 		}
 		switch(opt){
             case 's':
+            printf("option s '%s' \n", optarg);
                 break;
             case 'd':
+                printf("option d '%s' \n", optarg);
                 break;
             case 't' :
+                printf("option t '%s' \n", optarg);
                 filterType = atoi(optarg);
                 break;
             default:
