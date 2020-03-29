@@ -35,7 +35,7 @@ int main(int argc, char* argv[]){
     struct memPartageHeader writeHeader;
 
     struct sched_attr attr; 
-    int sched_policy;
+    int sched_policy = 0;
 
         /**
      * Section pour parse la commande 

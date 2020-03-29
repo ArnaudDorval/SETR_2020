@@ -35,7 +35,7 @@ int main(int argc, char* argv[]){
     struct memPartage writeZone;
     struct memPartageHeader writeHeader;
 
-    int sched_policy;
+    int sched_policy = 0;
     struct sched_attr attr ; 
 
     /**
