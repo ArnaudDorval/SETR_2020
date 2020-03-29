@@ -187,20 +187,30 @@ int main(int argc, char* argv[])
     // TODO
     // ÉCRIVEZ ICI votre code d'analyse des arguments du programme et d'initialisation des zones mémoire partagées
 
-    int opt; 
+    int opt, schedType = 0;
+	char deadlineOpts[32];
 
     // 1. Analyser parametres de la ligne de commande
 
-    while((opt = getopt(argc, argv, "s:d::")) != -1) {
+    while((opt = getopt(argc, argv, "s:d:")) != -1) {
     	switch (opt) {
     		case 's':
-
+                if (strcmp(optarg, "RR") == 0) {
+                    schedType = SCHED_RR;
+                }
+                else if (strcmp(optarg, "FIFO") == 0) {
+                    schedType = SCHED_FIFO;
+                }
+                else if (strcmp(optarg, "DEADLINE") == 0) {
+                    schedType = SCHED_DEADLINE;
+                }
+                //printf("%s\n", schedType);
     			break;
     		case 'd':
-
+                strcpy(deadlineOpts, optarg);
     			break;
     		default:
-    			// TODO: Error here
+                return -1;
     			break;
     	}
     }

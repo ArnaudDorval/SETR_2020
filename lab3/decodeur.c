@@ -50,23 +50,34 @@ int main(int argc, char* argv[]){
 	char *fichier_entree, *flux_sortie;
 
     int opt; 
+    int schedType = 0; 
+    char deadlineOpts[32];
 
     // 1. Analyser parametres de la ligne de commande
 
-    while((opt = getopt(argc, argv, "s:d::")) != -1) {
+    while((opt = getopt(argc, argv, "s:d:")) != -1) {
     	switch (opt) {
     		case 's':
-
+                if (strcmp(optarg, "RR") == 0) {
+                    schedType = SCHED_RR;
+                }
+                else if (strcmp(optarg, "FIFO") == 0) {
+                    schedType = SCHED_FIFO;
+                }
+                else if (strcmp(optarg, "DEADLINE") == 0) {
+                    schedType = SCHED_DEADLINE;
+                }
+                //printf("%s\n", schedType);
     			break;
     		case 'd':
-
+                strcpy(deadlineOpts, optarg);
     			break;
     		default:
-    			// TODO: Error here
+                return -1;
     			break;
     	}
     }
-
+    
     fichier_entree = argv[optind++];
     flux_sortie = argv[optind++];
 
@@ -130,7 +141,7 @@ int main(int argc, char* argv[]){
     }
 
     // 5. Ajuster les parametres de l'ordonnanceur
-    // TODO
+    
 
     // 6. Boucle principale de traitement
 
