@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
     // ÉCRIVEZ ICI votre code d'analyse des arguments du programme et d'initialisation des zones mémoire partagées
 
     int opt, schedType = 0;
-	char deadlineOpts[32];
+	char deadlineOpts[32]= "";
 
     // 1. Analyser parametres de la ligne de commande
 
@@ -246,7 +246,29 @@ int main(int argc, char* argv[])
 
     // 5. Ajuster les parametres de l'ordonnanceur
 
-    // TODO
+    if (schedType != 0) {
+        struct sched_attr attr;
+        attr.size = sizeof(attr);
+        attr.sched_flags = 0 ;
+        attr.sched_policy = schedType;
+
+        switch(schedType) {
+            case SCHED_RR:
+                //attr.sched_priority = ;
+                break;
+            case SCHED_FIFO:
+                //attr.sched_priority = ;
+                break;
+            case SCHED_DEADLINE:
+                attr.sched_priority = -101; 
+                attr.sched_runtime = 30000000;
+                attr.sched_period = 100000000;
+                attr.sched_deadline = attr.sched_period;
+                break;
+        }
+
+        sched_setattr(0, &attr, 0);
+    }
 
     // Initialisation des structures nécessaires à l'affichage
     long int screensize = 0;
