@@ -53,14 +53,14 @@ int main(int argc, char* argv[]){
 		}
 		switch(opt){
             case 't' :
-                filtreType = atoi(optarg);
+                filterType = atoi(optarg);
 		}
 	}
 
     if(debug_flag){
         strcpy(readSpace, "/mem1");
         strcpy(writeSpace, "/mem2");
-        filtreType = 0;
+        filterType = 0;
     }
     else{
         strcpy(readSpace, argv[argc-2]);
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]){
     }
 
     while(1){
-            if(filtreType){
+            if(filterType){
                 highpassFilter(readZone.header->hauteur,
                 readZone.header->largeur, 
                 readZone.data,
