@@ -55,7 +55,10 @@ int main(int argc, char* argv[]){
 				break;
 		}
 		switch(opt){
-            
+            case 's':
+                break;
+            case 'd':
+                break;
             case 'w' :
                 widthOutput = atoi(optarg);
                 break;

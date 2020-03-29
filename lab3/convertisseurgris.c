@@ -49,13 +49,17 @@ int main(int argc, char* argv[]){
 		};
 		int option_index;
 
-		opt = getopt_long(argc, argv, "", long_options, &option_index);
+		opt = getopt_long(argc, argv, "s:d:", long_options, &option_index);
 		if(opt == -1) {
 				break;
 		}
 		switch(opt){
-            case '?' :
+            case 's':
                 break;
+            case 'd':
+                break;
+            default:
+                printf("convertisseur bad request");
 
 		}
 	}

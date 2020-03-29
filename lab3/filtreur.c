@@ -46,12 +46,16 @@ int main(int argc, char* argv[]){
 
 		int option_index;
 
-		opt = getopt_long(argc, argv, "t:", long_options, &option_index);
+		opt = getopt_long(argc, argv, "s:d:t:", long_options, &option_index);
 
 		if(opt == -1) {
 				break;
 		}
 		switch(opt){
+            case 's':
+                break;
+            case 'd':
+                break;
             case 't' :
                 filterType = atoi(optarg);
             default:
