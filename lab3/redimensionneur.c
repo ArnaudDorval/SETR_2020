@@ -10,6 +10,8 @@
 #include "commMemoirePartagee.h"
 #include "utils.h"
 
+static int debug_flag;
+
 
 int main(int argc, char* argv[]){
     
@@ -17,7 +19,6 @@ int main(int argc, char* argv[]){
     // dans utils.c, celles commençant par "resize"). Votre code doit lire une image depuis une zone 
     // mémoire partagée et envoyer le résultat sur une autre zone mémoire partagée.
     // N'oubliez pas de respecter la syntaxe de la ligne de commande présentée dans l'énoncé.
-    int filterType = 0;
     int opt;
     
     char readSpace[30] = "";
@@ -110,7 +111,7 @@ int main(int argc, char* argv[]){
         sizeScale = sizeOutput;
     }
 
-    initMemoirePartageeEcrivain(writeSpace, &writeZone, outputSize, &writeHeader);
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, sizeOutput, &writeHeader);
     prepareMemoire(sizeScale, 0);
 
     attr.size = sizeof(attr);
