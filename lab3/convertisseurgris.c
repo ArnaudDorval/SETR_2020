@@ -60,6 +60,7 @@ int main(int argc, char* argv[]){
                 break;
             default:
                 printf("convertisseur bad request");
+                break;
 
 		}
 	}

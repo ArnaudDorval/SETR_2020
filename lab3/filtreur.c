@@ -58,8 +58,10 @@ int main(int argc, char* argv[]){
                 break;
             case 't' :
                 filterType = atoi(optarg);
+                break;
             default:
                 printf("filtreur bad request");
+                break;
 		}
 	}
 
