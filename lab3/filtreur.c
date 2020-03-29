@@ -18,22 +18,36 @@ int main(int argc, char* argv[]){
     // envoyer le résultat sur une autre zone mémoire partagée.
     // N'oubliez pas de respecter la syntaxe de la ligne de commande présentée dans l'énoncé.
 
-    int filtreType = 0, opt, sched_policy;
-    char espaceLecture[30] = "";
-    char espaceEcriture[30] = "";
-    uint32_t canaux = 0 ;
-    uint32_t hauteurEntree = 0 ;
-    uint32_t largeurEntree = 0 ;
+    int filterType = 0;
+    int opt;
+    
+    char readSpace[30] = "";
+    char writeSpace[30] = "";
+    uint32_t channel = 0;
+    uint32_t heightInput = 0;
+    uint32_t widthInput = 0;
 
+    struct memPartage readZone ;
+    struct memPartage writeZone;
+    struct memPartageHeader writeHeader;
+
+    struct sched_attr attr; 
+    int sched_policy;
+
+    /**
+     * Section pour parse la commande 
+     **/
     while(1){
 		static struct option long_options[] =
 		{
 			{"debug", no_argument, &debug_flag, 1},
 			{0, 0, 0, 0}
 		};
+
 		int option_index;
 
 		opt = getopt_long(argc, argv, "t:", long_options, &option_index);
+
 		if(opt == -1) {
 				break;
 		}
@@ -42,85 +56,91 @@ int main(int argc, char* argv[]){
                 filtreType = atoi(optarg);
 		}
 	}
+
     if(debug_flag){
-        strcpy(espaceLecture, "/mem1") ;
-        strcpy(espaceEcriture, "/mem2");
-        filtreType = 0 ; // filtre passe-bas ? 
+        strcpy(readSpace, "/mem1");
+        strcpy(writeSpace, "/mem2");
+        filtreType = 0;
     }
     else{
-        strcpy(espaceLecture, argv[argc-2]);
-        strcpy(espaceEcriture, argv[argc-1]) ;
+        strcpy(readSpace, argv[argc-2]);
+        strcpy(writeSpace, argv[argc-1]);
     }
 
-  struct memPartage zone_lecteur ;
-  initMemoirePartageeLecteur(espaceLecture, &zone_lecteur);
-  struct memPartage zone_ecrivain;
-  struct memPartageHeader zone_header_ecrivain;
-  zone_header_ecrivain.frameReader = 0 ;
-  zone_header_ecrivain.frameWriter = 0 ;
-  zone_header_ecrivain.largeur = zone_lecteur.header->largeur ; 
-  zone_header_ecrivain.hauteur = zone_lecteur.header->hauteur ;
-  zone_header_ecrivain.fps = zone_lecteur.header->fps ; 
-  zone_header_ecrivain.canaux = zone_lecteur.header->canaux;
-  hauteurEntree = zone_lecteur.header->hauteur;
-  largeurEntree = zone_lecteur.header->largeur;
-  canaux = zone_lecteur.header->canaux ;
-  size_t tailleImageSortie;
+    /**
+     * initialisation de l'espace partagé
+     **/
+    initMemoirePartageeLecteur(readSpace, &readZone);
 
-  tailleImageSortie = canaux * hauteurEntree * largeurEntree ;
+    writeHeader.frameReader = 0;
+    writeHeader.frameWriter = 0;
+    writeHeader.largeur = readZone.header->largeur; 
+    writeHeader.hauteur = readZone.header->hauteur;
+    writeHeader.fps = readZone.header->fps; 
+    writeHeader.canaux = readZone.header->canaux;
 
-  initMemoirePartageeEcrivain(espaceEcriture, &zone_ecrivain, tailleImageSortie, &zone_header_ecrivain);
-  prepareMemoire(tailleImageSortie, 0);
+    heightInput = readZone.header->hauteur;
+    widthInput = readZone.header->largeur;
+    channel = readZone.header->canaux;
+    size_t outputSize;
 
-  struct sched_attr attr ; 
-  attr.size = sizeof(attr);
-  attr.sched_flags = 0 ;
-  attr.sched_policy = sched_policy;
+    outputSize = channel * heightInput * widthInput;
 
-  switch (sched_policy)
-  {
-      case SCHED_NORMAL:
-      case SCHED_RR:
-          attr.__sched_priority = 0 ;
-          break ;
-      case SCHED_FIFO:
-          attr.__sched_priority = 0 ;
-          break;
-      case SCHED_DEADLINE : 
-          attr.sched_runtime = 30000000;
-          attr.sched_period = 100000000;
-          attr.sched_deadline = attr.sched_period;
-      default:
-          break ;
-  }
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, outputSize, &writeHeader);
+    prepareMemoire(outputSize, 0);
 
-  while(1){
-        if(filtreType){
-            highpassFilter(zone_lecteur.header->hauteur,
-            zone_lecteur.header->largeur, 
-            zone_lecteur.data,
-            zone_ecrivain.data,
-            3,
-            5,
-            zone_lecteur.header->canaux) ;
-        }
-        else{
-            lowpassFilter(zone_lecteur.header->hauteur,
-            zone_lecteur.header->largeur, 
-            zone_lecteur.data,
-            zone_ecrivain.data,
-            3,
-            5,
-            zone_lecteur.header->canaux) ;
-        }
-        zone_lecteur.header->frameReader++;
-        pthread_mutex_unlock(&(zone_lecteur.header->mutex)) ;
-        attenteLecteur(&zone_lecteur) ;
 
-        zone_ecrivain.header->frameWriter++;
-        pthread_mutex_unlock(&(zone_ecrivain.header->mutex)) ;
-        attenteEcrivain(&zone_ecrivain) ;
+    /**
+     * Set up de l'ordonnanceur 
+     **/
+    attr.size = sizeof(attr);
+    attr.sched_flags = 0;
+    attr.sched_policy = sched_policy;
 
+    switch (sched_policy)
+    {
+        case SCHED_NORMAL:
+        case SCHED_RR:
+            attr.__sched_priority = 0 ;
+            break ;
+        case SCHED_FIFO:
+            attr.__sched_priority = 0 ;
+            break;
+        case SCHED_DEADLINE : 
+            attr.sched_runtime = 30000000;
+            attr.sched_period = 100000000;
+            attr.sched_deadline = attr.sched_period;
+        default:
+            break ;
     }
-    return 0;
+
+    while(1){
+            if(filtreType){
+                highpassFilter(readZone.header->hauteur,
+                readZone.header->largeur, 
+                readZone.data,
+                readZone.data,
+                3,
+                5,
+                readZone.header->canaux) ;
+            }
+            else{
+                lowpassFilter(readZone.header->hauteur,
+                readZone.header->largeur, 
+                readZone.data,
+                readZone.data,
+                3,
+                5,
+                readZone.header->canaux) ;
+            }
+            readZone.header->frameReader++;
+            pthread_mutex_unlock(&(readZone.header->mutex)) ;
+            attenteLecteur(&readZone) ;
+
+            writeZone.header->frameWriter++;
+            pthread_mutex_unlock(&(writeZone.header->mutex)) ;
+            attenteEcrivain(&writeZone) ;
+
+        }
+        return 0;
 }
