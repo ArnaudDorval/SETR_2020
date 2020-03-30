@@ -53,10 +53,8 @@
 #include <err.h>
 #include <errno.h>
 
-// Nécessaire pour pouvoir utiliser sched_setattr et le mode DEADLINE
 #include <sched.h>
 #include "schedsupp.h"
-
 #include "allocateurMemoire.h"
 #include "commMemoirePartagee.h"
 #include "utils.h"
@@ -246,27 +244,7 @@ int main(int argc, char* argv[])
     // 5. Ajuster les parametres de l'ordonnanceur
 
     if (schedType != 0) {
-        struct sched_attr attr;
-        attr.size = sizeof(attr);
-        attr.sched_flags = 0 ;
-        attr.sched_policy = schedType;
-
-        switch(schedType) {
-            case SCHED_RR:
-                //attr.sched_priority = ;
-                break;
-            case SCHED_FIFO:
-                //attr.sched_priority = ;
-                break;
-            case SCHED_DEADLINE:
-                attr.sched_priority = -101; 
-                attr.sched_runtime = 30000000;
-                attr.sched_period = 100000000;
-                attr.sched_deadline = attr.sched_period;
-                break;
-        }
-
-        sched_setattr(0, &attr, 0);
+        setScheduling(schedType, deadlineOpts);
     }
 
     // Initialisation des structures nécessaires à l'affichage
@@ -331,6 +309,12 @@ int main(int argc, char* argv[])
 		return -1;
     }
 
+	double lastTimer[4] = {0};
+	double interval[4] = {0};
+	for (int i=0; i<nbrActifs; i++) {
+		interval[i] = 1.0 / memStruct[i].header->fps;
+	}
+
     while(1){
             // Boucle principale du programme
             // TODO
@@ -361,32 +345,31 @@ int main(int argc, char* argv[])
                         A_REMPLIR_NOMBRECANAUX_DANS_LA_TRAME); */
 
     	for (int i=0; i < nbrActifs; i++) {
+			if (get_time() - lastTimer[i] >= interval[i]) {
+				if (attenteLecteurAsync(&memStruct[i]) != 0) {
+					continue; 
+				}
 
-    		//TODO: Pour chaque source, si temps ecoule depuis dernier affichage > 1fps.
-
-    		if (attenteLecteurAsync(&memStruct[i]) != 0) {
-    			continue; 
-    		}
-
-    		ecrireImage(i, 
-                        nbrActifs, 
-                        fbfd, 
-                        fbp, 
-                        vinfo.xres, 
-                        vinfo.yres, 
-                        &vinfo, 
-                        finfo.line_length,
-                        memStruct[i].data,
-                        memStruct[i].header->largeur,
-                        memStruct[i].header->hauteur,
-                        memStruct[i].header->canaux);
-    	
-    	memStruct[i].header->frameReader += 1;
-
-    	pthread_mutex_unlock(&memStruct[i].header->mutex);
-    	}
+				ecrireImage(i, 
+							nbrActifs, 
+							fbfd, 
+							fbp, 
+							vinfo.xres, 
+							vinfo.yres, 
+							&vinfo, 
+							finfo.line_length,
+							memStruct[i].data,
+							memStruct[i].header->largeur,
+							memStruct[i].header->hauteur,
+							memStruct[i].header->canaux);
+			
+				memStruct[i].header->frameReader++;
+				pthread_mutex_unlock(&memStruct[i].header->mutex);
+				lastTimer[i] = get_time();
+			}
+		}
+		usleep(8000);
     }
-
 
     // cleanup
     // Retirer le mmap

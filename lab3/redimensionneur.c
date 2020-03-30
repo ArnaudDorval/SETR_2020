@@ -2,14 +2,13 @@
 #include <sys/resource.h>
 
 // Nécessaire pour pouvoir utiliser sched_setattr et le mode DEADLINE
+#include <getopt.h> 
 #include <sched.h>
 #include "schedsupp.h"
-#include <getopt.h> 
 
 #include "allocateurMemoire.h"
 #include "commMemoirePartagee.h"
 #include "utils.h"
-
 
 int main(int argc, char* argv[]){
     
@@ -106,28 +105,8 @@ int main(int argc, char* argv[]){
 
     // 5. Ajuster les parametres de l'ordonnanceur
 
-    struct sched_attr attr; 
-    int sched_policy = 0;
-
-    attr.size = sizeof(attr);
-    attr.sched_flags = 0;
-    attr.sched_policy = sched_policy;
-
-    switch (sched_policy)
-    {
-        case SCHED_NORMAL:
-        case SCHED_RR:
-            attr.__sched_priority = 0 ;
-            break ;
-        case SCHED_FIFO:
-            attr.__sched_priority = 0 ;
-            break;
-        case SCHED_DEADLINE : 
-            attr.sched_runtime = 30000000;
-            attr.sched_period = 100000000;
-            attr.sched_deadline = attr.sched_period;
-        default:
-            break ;
+    if (schedType != 0) {
+        setScheduling(schedType, deadlineOpts);
     }
 
     // 6. Boucle principale

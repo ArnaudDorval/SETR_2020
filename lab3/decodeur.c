@@ -139,29 +139,8 @@ int main(int argc, char* argv[]){
     }
 
     // 5. Ajuster les parametres de l'ordonnanceur
-
     if (schedType != 0) {
-        struct sched_attr attr;
-        attr.size = sizeof(attr);
-        attr.sched_flags = 0 ;
-        attr.sched_policy = schedType;
-
-        switch(schedType) {
-            case SCHED_RR:
-                //attr.sched_priority = ;
-                break;
-            case SCHED_FIFO:
-                //attr.sched_priority = ;
-                break;
-            case SCHED_DEADLINE:
-                attr.sched_priority = -101; 
-                attr.sched_runtime = 30000000;
-                attr.sched_period = 100000000;
-                attr.sched_deadline = attr.sched_period;
-                break;
-        }
-
-        sched_setattr(0, &attr, 0);
+        setScheduling(schedType, deadlineOpts);
     }
 
     // 6. Boucle principale de traitement
@@ -174,6 +153,8 @@ int main(int argc, char* argv[]){
     uint32_t currentFrame; 
 
     while (1) {
+        pthread_mutex_lock(&memStruct->header->mutex);
+
     	// Get frame size
     	memcpy(&currentFrame, videoMmap + index, 4);
         index += 4;
@@ -203,9 +184,6 @@ int main(int argc, char* argv[]){
     					fps,
     					"image.ppm");*/
         //break;
-
-        // Do we need the mutex before ?
-        pthread_mutex_lock(&memStruct->header->mutex);
 
         memStruct->header->frameWriter++;
 

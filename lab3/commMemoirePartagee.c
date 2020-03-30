@@ -50,7 +50,7 @@ int initMemoirePartageeEcrivain(const char* identifiant,
 	}
 
 	if (ftruncate(zone->fd, memorySpace) < 0) {
-		printf("Error using ftruncate.\n");
+		printf("Error using ftruncate with identifiant: %s\n", identifiant);
 		return -1;
 	}
 

@@ -2,9 +2,9 @@
 #include <sys/resource.h>
 
 // Nécessaire pour pouvoir utiliser sched_setattr et le mode DEADLINE
+#include <getopt.h> 
 #include <sched.h>
 #include "schedsupp.h"
-#include <getopt.h> 
 
 #include "allocateurMemoire.h"
 #include "commMemoirePartagee.h"
@@ -54,18 +54,18 @@ int main(int argc, char* argv[]){
     // 2. Initialiser la zone memoire d'entree (celle sur laquelle on doit lire les trames)
     // 2.1 Ouvrir la zone memoire d'entree et attendre qu'elle soit prete
 
-    struct memPartage readZone ;
-    struct memPartageHeader writeHeader;
+    struct memPartage readZone;
+    memPartageHeader* writeHeader = (memPartageHeader*)malloc(sizeof(memPartageHeader));
     initMemoirePartageeLecteur(readSpace, &readZone);
 
     // 2.2 Recuperer les informations sur le flux d'entree
 
-    writeHeader.frameReader = 0 ;
-    writeHeader.frameWriter = 0 ;
-    writeHeader.largeur = readZone.header->largeur ; 
-    writeHeader.hauteur = readZone.header->hauteur;
-    writeHeader.fps = readZone.header->fps ; 
-    writeHeader.canaux = 1;
+    writeHeader->frameReader = 0 ;
+    writeHeader->frameWriter = 0 ;
+    writeHeader->largeur = readZone.header->largeur ; 
+    writeHeader->hauteur = readZone.header->hauteur;
+    writeHeader->fps = readZone.header->fps ; 
+    writeHeader->canaux = 1;
 
     uint32_t height = readZone.header->hauteur;
     uint32_t width = readZone.header->largeur;
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){
 
     // 3.2 Ecrire les informations sur le flux de sortie
 
-    initMemoirePartageeEcrivain(writeSpace, &writeZone, sizeOutput, &writeHeader);
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, sizeOutput, writeHeader);
     
     // 4. Initialiser l'allocateur memoire et fixer les zones alloues (mlock)
 
@@ -88,28 +88,8 @@ int main(int argc, char* argv[]){
 
     // 5. Ajuster les parametres de l'ordonnanceur
 
-    int sched_policy = 0;
-    struct sched_attr attr ; 
-
-    attr.size = sizeof(attr);
-    attr.sched_flags = 0 ;
-    attr.sched_policy = sched_policy;
-
-    switch (sched_policy)
-    {
-        case SCHED_NORMAL:
-        case SCHED_RR:
-            attr.__sched_priority = 0 ;
-            break ;
-        case SCHED_FIFO:
-            attr.__sched_priority = 0 ;
-            break;
-        case SCHED_DEADLINE : 
-            attr.sched_runtime = 30000000;
-            attr.sched_period = 100000000;
-            attr.sched_deadline = attr.sched_period;
-        default:
-            break ;
+    if (schedType != 0) {
+        setScheduling(schedType, deadlineOpts);
     }
 
     // 6. Boucle principale de traitement
