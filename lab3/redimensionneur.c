@@ -67,19 +67,19 @@ int main(int argc, char* argv[]){
     // 2.1 Ouvrir la zone memoire d'entree et attendre qu'elle soit prete
     
     struct memPartage readZone ;
-    struct memPartageHeader writeHeader;
+    memPartageHeader* writeHeader = (memPartageHeader*)malloc(sizeof(memPartageHeader));
     initMemoirePartageeLecteur(readSpace, &readZone);
 
     // 2.2 Recuperer les informations sur le flux d'entree
 
     uint32_t heightInput , widthInput, channel = 0;
 
-    writeHeader.frameReader = 0;
-    writeHeader.frameWriter = 0;
-    writeHeader.largeur = widthOutput; 
-    writeHeader.hauteur = heightOutput;
-    writeHeader.fps = readZone.header->fps; 
-    writeHeader.canaux = readZone.header->canaux;
+    writeHeader->frameReader = 0;
+    writeHeader->frameWriter = 0;
+    writeHeader->largeur = widthOutput; 
+    writeHeader->hauteur = heightOutput;
+    writeHeader->fps = readZone.header->fps; 
+    writeHeader->canaux = readZone.header->canaux;
 
     heightInput = readZone.header->hauteur;
     widthInput = readZone.header->largeur;
@@ -97,11 +97,11 @@ int main(int argc, char* argv[]){
 
     // 3.2 Ecrire les informations sur le flux de sortie
 
-    initMemoirePartageeEcrivain(writeSpace, &writeZone, outP, &writeHeader);
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, outP, writeHeader);
     
     // 4. Initialiser l'allocateur memoire et fixer les zones alloues (mlock)
     
-    prepareMemoire(sizeInput, sizeOutput);
+    prepareMemoire(sizeInput*2, sizeOutput*2);
 
     // 5. Ajuster les parametres de l'ordonnanceur
 
