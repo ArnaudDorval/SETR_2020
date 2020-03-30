@@ -93,11 +93,11 @@ int main(int argc, char* argv[]){
     heightInput = readZone.header->hauteur;
     widthInput = readZone.header->largeur;
     channel = readZone.header->canaux;
-    size_t outputSize;
 
-    outputSize = channel * heightInput * widthInput;
+    size_t outputSize = channel * heightInput * widthInput;
+    size_t outputSizeMem = outputSize + sizeof(memPartageHeader);
 
-    initMemoirePartageeEcrivain(writeSpace, &writeZone, outputSize, &writeHeader);
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, outputSizeMem, &writeHeader);
     prepareMemoire(outputSize, 0);
 
 
