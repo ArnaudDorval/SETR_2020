@@ -135,24 +135,15 @@ int main(int argc, char* argv[]){
     ResizeGrid grid;
 
     if(resizeType){
-        grid = resizeNearestNeighborInit(heightOutput, widthOutput, heightInput, widthInput);
-    }else{
         grid = resizeBilinearInit(heightOutput, widthOutput, heightInput, widthInput);
+    }else{
+        grid = resizeNearestNeighborInit(heightOutput, widthOutput, heightInput, widthInput);
     }
 
-    while(1){
-        pthread_mutex_lock(&(writeZone.header->mutex));
-        
+    while(1){  
+        pthread_mutex_lock(&writeZone.header->mutex);
+
         if(resizeType){
-            resizeNearestNeighbor(readZone.data,
-                heightInput,
-                widthInput,
-                writeZone.data,
-                heightOutput,
-                widthOutput,
-                grid,
-                channel);
-        }else{
             resizeBilinear(readZone.data,
                 heightInput,
                 widthInput,
@@ -161,15 +152,27 @@ int main(int argc, char* argv[]){
                 widthOutput,
                 grid,
                 channel);
+        }else{
+            resizeNearestNeighbor(readZone.data,
+                heightInput,
+                widthInput,
+                writeZone.data,
+                heightOutput,
+                widthOutput,
+                grid,
+                channel);
         }
+
         readZone.header->frameReader++;
-        pthread_mutex_unlock(&(readZone.header->mutex)) ;
-        attenteLecteur(&readZone) ;
+        pthread_mutex_unlock(&readZone.header->mutex);
 
         writeZone.header->frameWriter++;
         writeZone.copieCompteur = writeZone.header->frameReader;
-        pthread_mutex_unlock(&(writeZone.header->mutex)) ;
-        attenteEcrivain(&writeZone) ;
+        pthread_mutex_unlock(&writeZone.header->mutex);
+
+        attenteLecteur(&readZone);
+        pthread_mutex_lock(&readZone.header->mutex);
+        attenteEcrivain(&writeZone);
     }
     return 0;
 }

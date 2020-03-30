@@ -69,7 +69,7 @@ int main(int argc, char* argv[]){
     channel = readZone.header->canaux;
 
     size_t outputSize = channel * height * width;
-    size_t outputSizeMem = outputSize + sizeof(memPartageHeader);
+    size_t sizeOutput = outputSize + sizeof(memPartageHeader);
 
     // 3. Initializer la zone memoire de sortie (celle sur laquelle on ecrit les trames)
     // 3.1 Creer la zone memoire
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]){
 
     // 3.2 Ecrire les informations sur le flux de sortie
 
-    initMemoirePartageeEcrivain(writeSpace, &writeZone, outputSizeMem, readZone.header);
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, sizeOutput, readZone.header);
     
     // 4 Initialiser l'allocateur memoire et fixer les zones alloues (mlock)
 
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]){
                            width, 
                            readZone.data,
                            writeZone.data,
-                           3,
+                           5,
                            5,
                            channel);
         }
@@ -129,19 +129,21 @@ int main(int argc, char* argv[]){
                           width, 
                           readZone.data,
                           writeZone.data,
-                          3,
+                          5,
                           5,
                           channel);
         }
         
-            readZone.header->frameReader++;
-            pthread_mutex_unlock(&readZone.header->mutex) ;
-            attenteLecteur(&readZone) ;
+        readZone.header->frameReader++;
+        pthread_mutex_unlock(&readZone.header->mutex);
 
-            writeZone.header->frameWriter++;
-            writeZone.copieCompteur = writeZone.header->frameReader;
-            pthread_mutex_unlock(&writeZone.header->mutex) ;
-            attenteEcrivain(&writeZone) ;
+        writeZone.header->frameWriter++;
+        writeZone.copieCompteur = writeZone.header->frameReader;
+        pthread_mutex_unlock(&writeZone.header->mutex);
+
+        attenteLecteur(&readZone);
+        pthread_mutex_lock(&readZone.header->mutex);
+        attenteEcrivain(&writeZone);
 
         }
         return 0;

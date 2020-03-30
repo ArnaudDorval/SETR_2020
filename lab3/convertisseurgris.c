@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
     uint32_t width = readZone.header->largeur;
     
     size_t sizeInput = readZone.header->canaux * height * width;
-    size_t sizeOutput = 1 * height * width;
+    size_t sizeOutput = 1 * height * width + sizeof(memPartageHeader);
 
     // 3. Initializer la zone memoire de sortie (celle sur laquelle on ecrit les trames)
     // 3.1 Creer la zone memoire
@@ -123,18 +123,16 @@ int main(int argc, char* argv[]){
                 3,
                 writeZone.data);
 
-
-
         readZone.header->frameReader++;
-        pthread_mutex_unlock(&(readZone.header->mutex)) ;
-        attenteLecteur(&readZone) ;
-        
+        pthread_mutex_unlock(&readZone.header->mutex);
+
         writeZone.header->frameWriter++;
         writeZone.copieCompteur = writeZone.header->frameReader;
-        pthread_mutex_unlock(&(writeZone.header->mutex)) ;
-        attenteEcrivain(&writeZone) ;
+        pthread_mutex_unlock(&writeZone.header->mutex);
 
+        attenteLecteur(&readZone);
+        pthread_mutex_lock(&readZone.header->mutex);
+        attenteEcrivain(&writeZone);
     }
-
     return 0;
 }
