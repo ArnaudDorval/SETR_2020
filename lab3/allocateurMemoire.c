@@ -8,7 +8,7 @@ static int  dataTable[N_ALLOC];
 size_t allocSize;
 
 int prepareMemoire(size_t tailleImageEntree, size_t tailleImageSortie) {
-	allocSize = (tailleImageEntree >= tailleImageSortie) ? tailleImageEntree : tailleImageSortie;
+	allocSize = (tailleImageEntree >= tailleImageSortie) ? tailleImageEntree*5 : tailleImageSortie*5;
 	
 	for (int i=0; i<N_ALLOC; i++) {
 		data[i] = malloc(allocSize);

@@ -9,7 +9,6 @@
 #include "allocateurMemoire.h"
 #include "commMemoirePartagee.h"
 #include "utils.h"
-static int debug_flag;
 
 int main(int argc, char* argv[]){
     
@@ -19,91 +18,79 @@ int main(int argc, char* argv[]){
     // N'oubliez pas de respecter la syntaxe de la ligne de commande présentée dans l'énoncé.
 
     int filterType = 0;
-    int opt;
     
-    char readSpace[100] = "";
-    char writeSpace[100] = "";
-    uint32_t channel = 0;
-    uint32_t heightInput = 0;
-    uint32_t widthInput = 0;
+    char readSpace[8] = "";
+    char writeSpace[8] = "";
 
-    struct memPartage readZone ;
-    struct memPartage writeZone;
-    struct memPartageHeader writeHeader;
+    int opt, schedType = 0; 
+    char deadlineOpts[32] = "";
 
-    struct sched_attr attr; 
-    int sched_policy = 0;
+    // 1. Analyser parametres de la ligne de commande
 
-    /**
-     * Section pour parse la commande 
-     **/
-    while(1){
-		static struct option long_options[] =
-		{
-			{"debug", no_argument, &debug_flag, 1},
-			{0, 0, 0, 0}
-		};
-
-		int option_index;
-
-		opt = getopt_long(argc, argv, "s:d:t:", long_options, &option_index);
-
-		if(opt == -1) {
-				break;
-		}
-		switch(opt){
-            case 's':
-            printf("option s '%s' \n", optarg);
-                break;
-            case 'd':
-                printf("option d '%s' \n", optarg);
-                break;
+    while((opt = getopt(argc, argv, "s:d:t:")) != -1) {
+    	switch (opt) {
+    		case 's':
+                if (strcmp(optarg, "RR") == 0) {
+                    schedType = SCHED_RR;
+                }
+                else if (strcmp(optarg, "FIFO") == 0) {
+                    schedType = SCHED_FIFO;
+                }
+                else if (strcmp(optarg, "DEADLINE") == 0) {
+                    schedType = SCHED_DEADLINE;
+                }
+                //printf("%s\n", schedType);
+    			break;
+    		case 'd':
+                strcpy(deadlineOpts, optarg);
+    			break;
             case 't' :
                 printf("option t '%s' \n", optarg);
                 filterType = atoi(optarg);
                 break;
-            default:
-                printf("filtreur bad request");
-                break;
-		}
-	}
-
-    if(debug_flag){
-        strcpy(readSpace, "/mem1");
-        strcpy(writeSpace, "/mem2");
-        filterType = 0;
-    }
-    else{
-        strcpy(readSpace, argv[argc-2]);
-        strcpy(writeSpace, argv[argc-1]);
+    		default:
+                return -1;
+    			break;
+    	}
     }
 
-    /**
-     * initialisation de l'espace partagé
-     **/
+    strcpy(readSpace, argv[optind++]);
+    strcpy(writeSpace, argv[optind++]);
+
+    // 2. Initialiser la zone memoire d'entree (celle sur laquelle on doit lire les trames)
+    // 2.1 Ouvrir la zone memoire d'entree et attendre qu'elle soit prete
+
+    struct memPartage readZone;
     initMemoirePartageeLecteur(readSpace, &readZone);
 
-    writeHeader.frameReader = 0;
-    writeHeader.frameWriter = 0;
-    writeHeader.largeur = readZone.header->largeur; 
-    writeHeader.hauteur = readZone.header->hauteur;
-    writeHeader.fps = readZone.header->fps; 
-    writeHeader.canaux = readZone.header->canaux;
+    // 2.2 Recuperer les informations sur le flux d'entree
 
-    heightInput = readZone.header->hauteur;
-    widthInput = readZone.header->largeur;
+    uint32_t width, height, channel = 0;
+    width = readZone.header->largeur;
+    height = readZone.header->hauteur;
     channel = readZone.header->canaux;
 
-    size_t outputSize = channel * heightInput * widthInput;
+    size_t outputSize = channel * height * width;
     size_t outputSizeMem = outputSize + sizeof(memPartageHeader);
 
-    initMemoirePartageeEcrivain(writeSpace, &writeZone, outputSizeMem, &writeHeader);
+    // 3. Initializer la zone memoire de sortie (celle sur laquelle on ecrit les trames)
+    // 3.1 Creer la zone memoire
+
+    struct memPartage writeZone;
+
+    // 3.2 Ecrire les informations sur le flux de sortie
+
+    initMemoirePartageeEcrivain(writeSpace, &writeZone, outputSizeMem, readZone.header);
+    
+    // 4 Initialiser l'allocateur memoire et fixer les zones alloues (mlock)
+
     prepareMemoire(outputSize, 0);
 
+    // 5. Ajuster les parametres de l'ordonnanceur
 
-    /**
-     * Set up de l'ordonnanceur 
-     **/
+    struct sched_attr attr; 
+    int sched_policy = 0;
+
     attr.size = sizeof(attr);
     attr.sched_flags = 0;
     attr.sched_policy = sched_policy;
@@ -122,34 +109,40 @@ int main(int argc, char* argv[]){
             attr.sched_period = 100000000;
             attr.sched_deadline = attr.sched_period;
         default:
-            break ;
+            break;
     }
 
+    // 6. Boucle principale de traitement.
+
     while(1){
-            if(filterType){
-                highpassFilter(readZone.header->hauteur,
-                readZone.header->largeur, 
-                readZone.data,
-                readZone.data,
-                3,
-                5,
-                readZone.header->canaux) ;
-            }
-            else{
-                lowpassFilter(readZone.header->hauteur,
-                readZone.header->largeur, 
-                readZone.data,
-                readZone.data,
-                3,
-                5,
-                readZone.header->canaux) ;
-            }
+        pthread_mutex_lock(&writeZone.header->mutex);
+
+        if(filterType){
+            highpassFilter(height,
+                           width, 
+                           readZone.data,
+                           writeZone.data,
+                           3,
+                           5,
+                           channel);
+        }
+        else {
+            lowpassFilter(height,
+                          width, 
+                          readZone.data,
+                          writeZone.data,
+                          3,
+                          5,
+                          channel);
+        }
+        
             readZone.header->frameReader++;
-            pthread_mutex_unlock(&(readZone.header->mutex)) ;
+            pthread_mutex_unlock(&readZone.header->mutex) ;
             attenteLecteur(&readZone) ;
 
             writeZone.header->frameWriter++;
-            pthread_mutex_unlock(&(writeZone.header->mutex)) ;
+            writeZone.copieCompteur = writeZone.header->frameReader;
+            pthread_mutex_unlock(&writeZone.header->mutex) ;
             attenteEcrivain(&writeZone) ;
 
         }
