@@ -97,8 +97,8 @@ int main(int argc, char* argv[]){
 
     writeHeader.frameReader = 0;
     writeHeader.frameWriter = 0;
-    writeHeader.largeur = readZone.header->largeur; 
-    writeHeader.hauteur = readZone.header->hauteur;
+    writeHeader.largeur = widthOutput; 
+    writeHeader.hauteur = heightOutput;
     writeHeader.fps = readZone.header->fps; 
     writeHeader.canaux = readZone.header->canaux;
 
@@ -108,21 +108,14 @@ int main(int argc, char* argv[]){
 
     size_t sizeInput;
     size_t sizeOutput;
-    size_t sizeScale;
 
     sizeInput = channel * heightInput * widthInput;
     sizeOutput = channel * heightOutput * widthOutput;
 
-    size_t outP= sizeOutput + sizeof(struct memPartageHeader);
-    if(sizeInput > sizeOutput){
-        sizeScale = sizeInput;
-    }else{
-        sizeScale = sizeOutput;
-    }
-
+    size_t outP = sizeOutput + sizeof(struct memPartageHeader);
 
     initMemoirePartageeEcrivain(writeSpace, &writeZone, outP, &writeHeader);
-    prepareMemoire(sizeScale, 0);
+    prepareMemoire(sizeInput, sizeOutput);
 
     attr.size = sizeof(attr);
     attr.sched_flags = 0;
