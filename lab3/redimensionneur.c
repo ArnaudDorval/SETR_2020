@@ -18,15 +18,13 @@ int main(int argc, char* argv[]){
     // mémoire partagée et envoyer le résultat sur une autre zone mémoire partagée.
     // N'oubliez pas de respecter la syntaxe de la ligne de commande présentée dans l'énoncé.
 
-    struct sched_attr attr; 
-    int sched_policy = 0;
-
    // 1. Analyser parametres de la ligne de commande
 
-   int opt, schedType = 0;
-   char deadlineOpts[32] = "";
+    int opt, schedType = 0;
+    char deadlineOpts[32] = "";
 
-    uint32_t heightOutput, widthOutput = 0;
+    uint32_t heightOutput = 0;
+    uint32_t widthOutput = 0;
     uint32_t resizeType = 1;
 
     while((opt = getopt(argc, argv, "s:d:w:h:m:")) != -1) {
@@ -108,6 +106,9 @@ int main(int argc, char* argv[]){
 
     // 5. Ajuster les parametres de l'ordonnanceur
 
+    struct sched_attr attr; 
+    int sched_policy = 0;
+
     attr.size = sizeof(attr);
     attr.sched_flags = 0;
     attr.sched_policy = sched_policy;
@@ -131,7 +132,6 @@ int main(int argc, char* argv[]){
 
     // 6. Boucle principale
 
-    pthread_mutex_lock(&(writeZone.header->mutex));
     ResizeGrid grid;
 
     if(resizeType){
@@ -141,6 +141,8 @@ int main(int argc, char* argv[]){
     }
 
     while(1){
+        pthread_mutex_lock(&(writeZone.header->mutex));
+        
         if(resizeType){
             resizeNearestNeighbor(readZone.data,
                 heightInput,
@@ -165,6 +167,7 @@ int main(int argc, char* argv[]){
         attenteLecteur(&readZone) ;
 
         writeZone.header->frameWriter++;
+        writeZone.copieCompteur = writeZone.header->frameReader;
         pthread_mutex_unlock(&(writeZone.header->mutex)) ;
         attenteEcrivain(&writeZone) ;
     }
