@@ -10,8 +10,6 @@
 #include "commMemoirePartagee.h"
 #include "utils.h"
 
-static int debug_flag;
-
 
 int main(int argc, char* argv[]){
     
@@ -19,81 +17,65 @@ int main(int argc, char* argv[]){
     // dans utils.c, celles commençant par "resize"). Votre code doit lire une image depuis une zone 
     // mémoire partagée et envoyer le résultat sur une autre zone mémoire partagée.
     // N'oubliez pas de respecter la syntaxe de la ligne de commande présentée dans l'énoncé.
-    int opt;
-    
-    char readSpace[100] = "";
-    char writeSpace[100] = "";
-    uint32_t channel = 0;
-    uint32_t heightInput = 0;
-    uint32_t widthInput = 0;
-    uint32_t heightOutput = 0;
-    uint32_t widthOutput = 0;
-    uint32_t resizeType = 1;
-
-    struct memPartage readZone ;
-    struct memPartage writeZone;
-    struct memPartageHeader writeHeader;
 
     struct sched_attr attr; 
     int sched_policy = 0;
 
-        /**
-     * Section pour parse la commande 
-     **/
-    while(1){
-		static struct option long_options[] =
-		{
-			{"debug", no_argument, &debug_flag, 1},
-			{0, 0, 0, 0}
-		};
+   // 1. Analyser parametres de la ligne de commande
 
-		int option_index;
+   int opt, schedType = 0;
+   char deadlineOpts[32] = "";
 
-		opt = getopt_long(argc, argv, "s:d:w:h:m:", long_options, &option_index);
+    uint32_t heightOutput, widthOutput = 0;
+    uint32_t resizeType = 1;
 
-		if(opt == -1) {
-				break;
-		}
-		switch(opt){
-            case 's':
-                printf("option s '%s' \n", optarg);
-                break;
-            case 'd':
-                printf("option d '%s' \n", optarg);
-                break;
+    while((opt = getopt(argc, argv, "s:d:w:h:m:")) != -1) {
+    	switch (opt) {
+    		case 's':
+                if (strcmp(optarg, "RR") == 0) {
+                    schedType = SCHED_RR;
+                }
+                else if (strcmp(optarg, "FIFO") == 0) {
+                    schedType = SCHED_FIFO;
+                }
+                else if (strcmp(optarg, "DEADLINE") == 0) {
+                    schedType = SCHED_DEADLINE;
+                }
+    			break;
+    		case 'd':
+                strcpy(deadlineOpts, optarg);
+    			break;
             case 'w' :
-                printf("option w '%s' \n", optarg);
                 widthOutput = atoi(optarg);
                 break;
             case 'h' :
-                printf("option h '%s' \n", optarg);
                 heightOutput = atoi(optarg);
                 break;
             case 'm' :
-                printf("option m '%s' \n", optarg);
                 resizeType = atoi(optarg);
                 break;
-            default:
-                printf("redimensionneur bad request");
-                break;
-            
-		}
-	}
-
-    if(debug_flag){
-        strcpy(readSpace, "/mem1");
-        strcpy(writeSpace, "/mem2");
-        widthOutput = 400;
-        heightOutput = 250;
-        resizeType = 1;
-    }
-    else{
-        strcpy(readSpace, argv[argc-2]);
-        strcpy(writeSpace, argv[argc-1]);
+    		default:
+                return -1;
+    			break;
+    	}
     }
 
+    char readSpace[8] = "";
+    char writeSpace[8] = "";
 
+    strcpy(readSpace, argv[optind++]);
+    strcpy(writeSpace, argv[optind++]);
+
+    // 2. Initialiser la zone memoire d'entree (celle sur laquelle on doit lire les trames)
+    // 2.1 Ouvrir la zone memoire d'entree et attendre qu'elle soit prete
+    
+    struct memPartage readZone ;
+    struct memPartageHeader writeHeader;
     initMemoirePartageeLecteur(readSpace, &readZone);
+
+    // 2.2 Recuperer les informations sur le flux d'entree
+
+    uint32_t heightInput , widthInput, channel = 0;
 
     writeHeader.frameReader = 0;
     writeHeader.frameWriter = 0;
@@ -106,16 +88,25 @@ int main(int argc, char* argv[]){
     widthInput = readZone.header->largeur;
     channel = readZone.header->canaux;
 
-    size_t sizeInput;
-    size_t sizeOutput;
-
-    sizeInput = channel * heightInput * widthInput;
-    sizeOutput = channel * heightOutput * widthOutput;
+    size_t sizeInput = channel * heightInput * widthInput;
+    size_t sizeOutput = channel * heightOutput * widthOutput;
 
     size_t outP = sizeOutput + sizeof(struct memPartageHeader);
 
+    // 3. Initializer la zone memoire de sortie (celle sur laquelle on ecrit les trames)
+    // 3.1 Creer la zone memoire
+
+    struct memPartage writeZone;
+
+    // 3.2 Ecrire les informations sur le flux de sortie
+
     initMemoirePartageeEcrivain(writeSpace, &writeZone, outP, &writeHeader);
+    
+    // 4. Initialiser l'allocateur memoire et fixer les zones alloues (mlock)
+    
     prepareMemoire(sizeInput, sizeOutput);
+
+    // 5. Ajuster les parametres de l'ordonnanceur
 
     attr.size = sizeof(attr);
     attr.sched_flags = 0;
@@ -137,6 +128,8 @@ int main(int argc, char* argv[]){
         default:
             break ;
     }
+
+    // 6. Boucle principale
 
     pthread_mutex_lock(&(writeZone.header->mutex));
     ResizeGrid grid;

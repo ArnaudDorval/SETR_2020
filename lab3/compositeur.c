@@ -204,7 +204,6 @@ int main(int argc, char* argv[])
                 else if (strcmp(optarg, "DEADLINE") == 0) {
                     schedType = SCHED_DEADLINE;
                 }
-                //printf("%s\n", schedType);
     			break;
     		case 'd':
                 strcpy(deadlineOpts, optarg);
