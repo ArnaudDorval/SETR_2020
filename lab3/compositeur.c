@@ -315,6 +315,8 @@ int main(int argc, char* argv[])
 		interval[i] = 1.0 / memStruct[i].header->fps;
 	}
 
+	FILE *log = fopen("stats.txt", "w+");
+
     while(1){
             // Boucle principale du programme
             // TODO
@@ -345,7 +347,8 @@ int main(int argc, char* argv[])
                         A_REMPLIR_NOMBRECANAUX_DANS_LA_TRAME); */
 
     	for (int i=0; i < nbrActifs; i++) {
-			if (get_time() - lastTimer[i] >= interval[i]) {
+			double delta = get_time() - lastTimer[i];
+			if (delta >= interval[i]) {
 				if (attenteLecteurAsync(&memStruct[i]) != 0) {
 					continue; 
 				}
@@ -366,9 +369,10 @@ int main(int argc, char* argv[])
 				memStruct[i].header->frameReader++;
 				pthread_mutex_unlock(&memStruct[i].header->mutex);
 				lastTimer[i] = get_time();
+				fprintf(log, "%f | STREAM: %d | FPS: %f\n", get_time(), i, 1.0/delta);
 			}
 		}
-		usleep(8000);
+		usleep(4000);
     }
 
     // cleanup
