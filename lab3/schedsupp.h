@@ -32,6 +32,9 @@ struct sched_attr {
     __u64 sched_period;
 };
 
+struct sched_param schedParams;
+struct sched_attr schedAttr;
+
 int sched_setattr(pid_t pid,
               const struct sched_attr *attr,
               unsigned int flags)
@@ -49,19 +52,19 @@ int sched_getattr(pid_t pid,
 
 void setScheduling(int schedType, char *schedArgs)
 {
-    sched_attr schedAttr;
-    schedAttr.size = sizeof(sched_attr);
-    schedAttr.sched_flags = 0;
-    schedAttr.sched_policy = schedType;
-
     switch (schedType) {
         case SCHED_RR:
             schedAttr.sched_priority = sched_get_priority_max(SCHED_RR);
+            sched_setscheduler(0, SCHED_RR, &schedParams);
         break;
         case SCHED_FIFO:
             schedAttr.sched_priority = sched_get_priority_max(SCHED_FIFO);
+            sched_setscheduler(0, SCHED_FIFO, &schedParams);
             break;
         case SCHED_DEADLINE:
+                sched_setscheduler(0, SCHED_DEADLINE, &schedParams);
+                sched_getattr(0, &schedAttr, sizeof(sched_attr), 0);
+                schedAttr.sched_policy = SCHED_DEADLINE;
             if (schedArgs[0] != 0)
             {
                 unsigned long long param[3] = {1, 1, 1};
@@ -81,10 +84,10 @@ void setScheduling(int schedType, char *schedArgs)
                 schedAttr.sched_period = 100000000;
                 schedAttr.sched_deadline = schedAttr.sched_deadline;
             }
+            if (sched_setattr(0, &schedAttr, 0) != 0)
+            {
+                printf("Could not set scheduling.\n");
+            }
             break;
-    }
-    if (sched_setattr(0, &schedAttr, 0) != 0)
-    {
-        printf("Could not set scheduling.\n");
     }
 }
