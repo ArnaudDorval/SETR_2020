@@ -153,7 +153,6 @@ int main(int argc, char* argv[]){
     uint32_t currentFrame; 
 
     while (1) {
-        pthread_mutex_lock(&memStruct->header->mutex);
 
     	// Get frame size
     	memcpy(&currentFrame, videoMmap + index, 4);
@@ -184,6 +183,8 @@ int main(int argc, char* argv[]){
     					fps,
     					"image.ppm");*/
         //break;
+
+        pthread_mutex_lock(&memStruct->header->mutex);
 
         memStruct->header->frameWriter++;
 

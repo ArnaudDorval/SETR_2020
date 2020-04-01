@@ -120,8 +120,6 @@ int main(int argc, char* argv[]){
     }
 
     while(1){  
-        pthread_mutex_lock(&writeZone.header->mutex);
-
         if(resizeType){
             resizeBilinear(readZone.data,
                 heightInput,
@@ -142,16 +140,18 @@ int main(int argc, char* argv[]){
                 channel);
         }
 
+        readZone.copieCompteur = readZone.header->frameWriter;
         readZone.header->frameReader++;
         pthread_mutex_unlock(&readZone.header->mutex);
 
-        writeZone.header->frameWriter++;
         writeZone.copieCompteur = writeZone.header->frameReader;
+        writeZone.header->frameWriter++;
         pthread_mutex_unlock(&writeZone.header->mutex);
 
         attenteLecteur(&readZone);
         pthread_mutex_lock(&readZone.header->mutex);
         attenteEcrivain(&writeZone);
+        pthread_mutex_lock(&writeZone.header->mutex);
     }
     return 0;
 }
