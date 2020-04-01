@@ -1,5 +1,8 @@
 #include "commMemoirePartagee.h"
 
+#pragma GCC push_options
+#pragma GCC optimize("O0")
+
 int initMemoirePartageeLecteur(const char* identifiant,
                                 struct memPartage *zone) {
 	
@@ -100,3 +103,5 @@ int attenteEcrivain(struct memPartage *zone) {
 	while(zone->copieCompteur == zone->header->frameReader);
 	return 1; //pthread_mutex_lock(&zone->header->mutex);
 }
+
+#pragma GCC pop_options
