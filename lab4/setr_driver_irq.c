@@ -194,6 +194,10 @@ static int __init setrclavier_init(void){
     //
     // Vous devez également initialiser le mutex de synchronisation.
 
+
+
+    mutex_init(&sync);
+
     ok = request_irq(irqno,                 // Le numéro de l'interruption, obtenue avec gpio_to_irq
          (irq_handler_t) setr_irq_handler,  // Pointeur vers la routine de traitement de l'interruption
          IRQF_TRIGGER_RISING,               // On veut une interruption sur le front montant (lorsque le bouton est pressé)
