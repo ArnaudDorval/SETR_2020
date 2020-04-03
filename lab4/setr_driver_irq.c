@@ -194,7 +194,11 @@ static int __init setrclavier_init(void){
     //
     // Vous devez également initialiser le mutex de synchronisation.
 
-
+    for (int i=0; i<4; i++) {
+      gpio_request_one(gpiosLire[i], GPIOF_IN, gpiosLireNoms[i]);
+      gpio_request_one(gpiosEcrire[i], GPIOF_OUT_INIT_LOW, gpiosEcrireNoms[i]);
+      gpio_set_debounce(gpiosLire[i], dureeDebounce);
+    }
 
     mutex_init(&sync);
 
@@ -272,6 +276,6 @@ module_exit(setrclavier_exit);
 
 // Description du module
 MODULE_LICENSE("GPL");            // Licence : laissez "GPL"
-MODULE_AUTHOR("Vous!");           // Vos noms
+MODULE_AUTHOR("Mathieu Chouinard & Arnaud Dorval");           // Vos noms
 MODULE_DESCRIPTION("Lecteur de clavier externe, avec interruptions");  // Description du module
 MODULE_VERSION("0.2");            // Numéro de version

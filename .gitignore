@@ -1,3 +1,4 @@
 **/build
 **/syncAndStartGDB.sh
 **/.vscode
+**/syncFiles.sh

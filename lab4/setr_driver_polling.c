@@ -40,9 +40,6 @@
 // Le nombre de caractères pouvant être contenus dans le buffer circulaire
 #define TAILLE_BUFFER 256
 
-// La duree en millisecondes du debounce pour la lecture
-#define DEBOUNCE_TIME 100
-
 
 // Déclaration des fonctions pour gérer notre fichier
 // Nous ne définissons que open(), close() et read()
@@ -172,7 +169,7 @@ static int __init setrclavier_init(void){
     for (int i=0; i<4; i++) {
       gpio_request_one(gpiosLire[i], GPIOF_IN, gpiosLireNoms[i]);
       gpio_request_one(gpiosEcrire[i], GPIOF_OUT_INIT_LOW, gpiosEcrireNoms[i]);
-      gpio_set_debounce(gpiosLire[i], DEBOUNCE_TIME);
+      gpio_set_debounce(gpiosLire[i], dureeDebounce);
     }
 
     // mutex initialization
