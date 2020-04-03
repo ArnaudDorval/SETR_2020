@@ -87,7 +87,9 @@ int initMemoirePartageeEcrivain(const char* identifiant,
 }
 
 int attenteLecteur(struct memPartage *zone) {
-	while (zone->header->frameReader == zone->header->frameWriter);
+	while (zone->header->frameReader == zone->header->frameWriter) {
+        usleep(3000);
+    }
 	return 1; //pthread_mutex_lock(&zone->header->mutex);
 }
 
@@ -100,7 +102,9 @@ int attenteLecteurAsync(struct memPartage *zone) {
 }
 
 int attenteEcrivain(struct memPartage *zone) {
-	while(zone->copieCompteur == zone->header->frameReader);
+	while(zone->copieCompteur == zone->header->frameReader) {
+        usleep(3000);
+    }
 	return 1; //pthread_mutex_lock(&zone->header->mutex);
 }
 

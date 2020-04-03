@@ -52,19 +52,21 @@ int sched_getattr(pid_t pid,
 
 void setScheduling(int schedType, char *schedArgs)
 {
+
+    memset(&schedAttr, 0, sizeof(struct sched_attr));
+    schedAttr.size = sizeof(struct sched_attr);
+    schedAttr.sched_flags = SCHED_FLAG_RESET_ON_FORK;
+
+    schedAttr.sched_policy = schedType;
+
     switch (schedType) {
         case SCHED_RR:
-            schedAttr.sched_priority = sched_get_priority_max(SCHED_RR);
-            sched_setscheduler(0, SCHED_RR, &schedParams);
+            schedAttr.sched_priority = 99;
         break;
         case SCHED_FIFO:
-            schedAttr.sched_priority = sched_get_priority_max(SCHED_FIFO);
-            sched_setscheduler(0, SCHED_FIFO, &schedParams);
+            schedAttr.sched_priority = sched_get_priority_min(SCHED_FIFO);
             break;
         case SCHED_DEADLINE:
-                sched_setscheduler(0, SCHED_DEADLINE, &schedParams);
-                sched_getattr(0, &schedAttr, sizeof(sched_attr), 0);
-                schedAttr.sched_policy = SCHED_DEADLINE;
             if (schedArgs[0] != 0)
             {
                 unsigned long long param[3] = {1, 1, 1};
@@ -80,14 +82,14 @@ void setScheduling(int schedType, char *schedArgs)
                 schedAttr.sched_period = param[2];
             }
             else {
-                schedAttr.sched_runtime = 30000000;
+                schedAttr.sched_runtime = 9500000;
+                schedAttr.sched_deadline = 19500000;
                 schedAttr.sched_period = 100000000;
-                schedAttr.sched_deadline = schedAttr.sched_deadline;
             }
+            break;
+    }
             if (sched_setattr(0, &schedAttr, 0) != 0)
             {
                 printf("Could not set scheduling.\n");
             }
-            break;
-    }
 }
