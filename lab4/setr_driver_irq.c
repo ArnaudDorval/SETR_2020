@@ -198,33 +198,36 @@ static int __init setrclavier_init(void){
       gpio_request_one(gpiosLire[i], GPIOF_IN, gpiosLireNoms[i]);
       gpio_request_one(gpiosEcrire[i], GPIOF_OUT_INIT_LOW, gpiosEcrireNoms[i]);
       gpio_set_debounce(gpiosLire[i], dureeDebounce);
+
+      irqId[i] = gpio_to_irq(gpiosLire[i]);
+
+        ok = request_irq(irqId[i],                 // Le numéro de l'interruption, obtenue avec gpio_to_irq
+             (irq_handler_t) setr_irq_handler,  // Pointeur vers la routine de traitement de l'interruption
+             IRQF_TRIGGER_RISING,               // On veut une interruption sur le front montant (lorsque le bouton est pressé)
+             "setr_irq_handler",                // Le nom de notre interruption
+             NULL);                             // Paramètre supplémentaire inutile pour vous
+        
+        if(ok != 0)
+            printk(KERN_ALERT "Erreur (%d) lors de l'enregistrement IRQ #{%d}!\n", ok, irqId[i]);
     }
-
     mutex_init(&sync);
-
-    ok = request_irq(irqno,                 // Le numéro de l'interruption, obtenue avec gpio_to_irq
-         (irq_handler_t) setr_irq_handler,  // Pointeur vers la routine de traitement de l'interruption
-         IRQF_TRIGGER_RISING,               // On veut une interruption sur le front montant (lorsque le bouton est pressé)
-         "setr_irq_handler",                // Le nom de notre interruption
-         NULL);                             // Paramètre supplémentaire inutile pour vous
-    if(ok != 0)
-        printk(KERN_ALERT "Erreur (%d) lors de l'enregistrement IRQ #{%d}!\n", ok, irqno);
-
-
-        printk(KERN_INFO "SETR_CLAVIER : Fin de l'Initialisation!\n"); // Made it! device was initialized
+    printk(KERN_INFO "SETR_CLAVIER : Fin de l'Initialisation!\n"); // Made it! device was initialized
 
     return 0;
 }
 
 
 static void __exit setrclavier_exit(void){
-    int i;
-
     // TODO
     // Écrivez le code permettant de relâcher (libérer) les GPIO
     // Vous aurez pour cela besoin de la fonction gpio_free
     // Vous devrez également relâcher les interruptions qui ont été
     // précédemment enregistrées. Utilisez free_irq(irqno, NULL)
+    for (int i=0; i<4; i++) {
+        gpio_free(gpiosLire[i]);
+        gpio_free(gpiosEcrire[i]);
+        free_irq(irqId[i], NULL);
+    }
 
     // On retire correctement les différentes composantes du pilote
     device_destroy(setrClasse, MKDEV(majorNumber, 0));

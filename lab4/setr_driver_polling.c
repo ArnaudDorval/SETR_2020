@@ -120,6 +120,13 @@ static int pollClavier(void *arg){
       // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
       // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
 
+    for (ligneIdx = 0; ligneIdx < 4; ligneIdx++) {
+      for (colIdx = 0; colIdx < 4; colIdx++) {
+        
+        
+      }
+    }
+
 
       set_current_state(TASK_INTERRUPTIBLE); // On indique qu'on peut ere interrompu
       msleep(pausePollingMs);                // On se met en pause un certain temps
@@ -167,9 +174,9 @@ static int __init setrclavier_init(void){
     // Vous devez également initialiser le mutex de synchronisation.
 
     for (int i=0; i<4; i++) {
-      gpio_request_one(gpiosLire[i], GPIOF_IN, gpiosLireNoms[i]);
-      gpio_request_one(gpiosEcrire[i], GPIOF_OUT_INIT_LOW, gpiosEcrireNoms[i]);
-      gpio_set_debounce(gpiosLire[i], dureeDebounce);
+        gpio_request_one(gpiosLire[i], GPIOF_IN, gpiosLireNoms[i]);
+        gpio_request_one(gpiosEcrire[i], GPIOF_OUT_INIT_LOW, gpiosEcrireNoms[i]);
+        gpio_set_debounce(gpiosLire[i], dureeDebounce);
     }
 
     // mutex initialization
@@ -185,14 +192,16 @@ static int __init setrclavier_init(void){
 
 
 static void __exit setrclavier_exit(void){
-    int i;
-
     // On arrête le thread de lecture
     kthread_stop(task);
 
     // TODO
     // Écrivez le code permettant de relâcher (libérer) les GPIO
     // Vous aurez pour cela besoin de la fonction gpio_free
+    for (int i=0; i<4; i++) {
+        gpio_free(gpiosLire[i]);
+        gpio_free(gpiosEcrire[i]);
+    }
 
     // On retire correctement les différentes composantes du pilote
     device_destroy(setrClasse, MKDEV(majorNumber, 0));
