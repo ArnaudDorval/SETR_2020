@@ -111,7 +111,7 @@ void func_tasklet_polling(unsigned long param){
     // touche est pressée.
     // Une différence majeure est que ce tasklet ne contient pas de boucle,
     // il ne s'exécute qu'une seule fois par interruption!
-    int patternIdx, ligneIdx, colIdx, val;
+    int patternIdx, ligneIdx, colIdx, gpioVal;
 
     // TODO
     // Écrivez le code permettant
@@ -126,6 +126,26 @@ void func_tasklet_polling(unsigned long param){
     // 5) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
     // 6) Remettre toutes les lignes à 1 (pour réarmer l'interruption)
     // 7) Réactiver le traitement des interruptions
+
+    // 1) De passer au travers de tous les patrons de balayage
+    for (ligneIdx = 0; ligneIdx < 4; ligneIdx++) {
+      gpio_set_value(gpiosEcrire[ligneIdx], 1);
+      for (colIdx = 0; colIdx < 4; colIdx++) {
+        // 2) Pour chaque patron, vérifier la valeur des lignes d'entrée
+        gpioVal = gpio_get_value(gpiosLire[colIdx]);
+
+        // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
+        if (gpioVal != dernierEtat[ligneIdx][colIdx]) {
+          // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
+          mutex_lock(&sync);
+          data[posCouranteEcriture] = valeursClavier[ligneIdx][colIdx];
+          posCouranteEcriture = (posCouranteEcriture + 1) % TAILLE_BUFFER;
+          mutex_unlock(&sync);
+          dernierEtat[ligneIdx][colIdx] = gpioVal;
+        }
+      }
+      gpio_set_value(gpiosEcrire[ligneIdx], 0);
+    }
 
 }
 
