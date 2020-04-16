@@ -108,7 +108,7 @@ static int dureeDebounce = 50;
 
 static int pollClavier(void *arg){
     // Cette fonction contient la boucle principale du thread détectant une pression sur une touche
-    int patternIdx, ligneIdx, colIdx, val;
+    int patternIdx, ligneIdx, colIdx, gpioVal;
     printk(KERN_INFO "SETR_CLAVIER : Poll clavier declenche! \n");
     while(!kthread_should_stop()){           // Permet de s'arrêter en douceur lorsque kthread_stop() sera appelé
       set_current_state(TASK_RUNNING);      // On indique qu'on est en train de faire quelque chose
@@ -120,11 +120,24 @@ static int pollClavier(void *arg){
       // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
       // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
 
+    // 1) De passer au travers de tous les patrons de balayage
     for (ligneIdx = 0; ligneIdx < 4; ligneIdx++) {
+      gpio_set_value(gpiosEcrire[ligneIdx], 1);
       for (colIdx = 0; colIdx < 4; colIdx++) {
-        
-        
+        // 2) Pour chaque patron, vérifier la valeur des lignes d'entrée
+        gpioVal = gpio_get_value(gpiosLire[colIdx]);
+
+        // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
+        if (gpioVal != dernierEtat[ligneIdx][colIdx]) {
+          // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
+          mutex_lock(&sync);
+          data[posCouranteEcriture] = valeursClavier[ligneIdx][colIdx];
+          posCouranteEcriture = (posCouranteEcriture + 1) % TAILLE_BUFFER;
+          mutex_unlock(&sync);
+          dernierEtat[ligneIdx][colIdx] = gpioVal;
+        }
       }
+      gpio_set_value(gpiosEcrire[ligneIdx], 0);
     }
 
 
