@@ -290,6 +290,23 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
     // revienne alors à 0. Il est donc tout à fait possible que posCouranteEcriture soit INFÉRIEUR à
     // posCouranteLecture, et vous devez gérer ce cas sans perdre de caractères et en respectant les
     // autres conditions (par exemple, ne jamais copier plus que len caractères).
+
+    ssize_t bufferLen = 0;
+    char bufferCopy[TAILLE_BUFFER];
+
+    mutex_lock(&sync);
+    bufferLen = (posCouranteLecture > posCouranteEcriture) ? TAILLE_BUFFER + posCouranteEcriture - posCouranteLecture : posCouranteEcriture - posCouranteLecture;
+    bufferLen = (bufferLen > len) ? len : bufferLen;
+
+    for (int i=0; i < bufferLen; i++) {
+        int bufferCopy[i] = data[(posCouranteLecture + i) % TAILLE_BUFFER];
+    }
+
+    posCouranteLecture = (posCouranteLecture + bufferLen) % TAILLE_BUFFER;
+    copy_to_user(buffer, bufferCopy, bufferLen);
+    mutex_unlock(&sync);
+
+    return bufferLen;
 }
 
 
