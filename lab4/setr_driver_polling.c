@@ -102,7 +102,7 @@ module_param(pausePollingMs, uint, S_IRUGO);
 MODULE_PARM_DESC(pausePollingMs, " Duree de la pause apres chaque polling (en ms, 20ms par defaut)");
 
 // Durée (en ms) du "debounce" des touches
-static int dureeDebounce = 50;
+static int dureeDebounce = 200;
 
 
 
@@ -126,16 +126,23 @@ static int pollClavier(void *arg){
       for (colIdx = 0; colIdx < 4; colIdx++) {
         // 2) Pour chaque patron, vérifier la valeur des lignes d'entrée
         gpioVal = gpio_get_value(gpiosLire[colIdx]);
-
+        
         // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
-        if (gpioVal != dernierEtat[ligneIdx][colIdx]) {
+        if (gpioVal != dernierEtat[ligneIdx][colIdx] && gpioVal == 1) {
+          printk(" val gpio %i", gpioVal);
           // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
           mutex_lock(&sync);
           data[posCouranteEcriture] = valeursClavier[ligneIdx][colIdx];
-          posCouranteEcriture = (posCouranteEcriture + 1) % TAILLE_BUFFER;
+          //posCouranteEcriture = (posCouranteEcriture + 1) % TAILLE_BUFFER;
           mutex_unlock(&sync);
-          dernierEtat[ligneIdx][colIdx] = gpioVal;
+          posCouranteEcriture++;
+          printk(" poscouranteecriture %i", posCouranteEcriture);
+          if (posCouranteEcriture == TAILLE_BUFFER){
+              posCouranteEcriture = 0;
+          }
+          
         }
+        dernierEtat[ligneIdx][colIdx] = gpioVal;
       }
       gpio_set_value(gpiosEcrire[ligneIdx], 0);
     }
@@ -185,7 +192,7 @@ static int __init setrclavier_init(void){
     //
     // Vous devez également initialiser le mutex de synchronisation.
 
-    for (int i=0; i<4; i++) {
+    for (i=0; i<4; i++) {
         gpio_request_one(gpiosLire[i], GPIOF_IN, gpiosLireNoms[i]);
         gpio_request_one(gpiosEcrire[i], GPIOF_OUT_INIT_LOW, gpiosEcrireNoms[i]);
         gpio_set_debounce(gpiosLire[i], dureeDebounce);
@@ -205,12 +212,13 @@ static int __init setrclavier_init(void){
 
 static void __exit setrclavier_exit(void){
     // On arrête le thread de lecture
+    int i;
     kthread_stop(task);
 
     // TODO
     // Écrivez le code permettant de relâcher (libérer) les GPIO
     // Vous aurez pour cela besoin de la fonction gpio_free
-    for (int i=0; i<4; i++) {
+    for (i=0; i<4; i++) {
         gpio_free(gpiosLire[i]);
         gpio_free(gpiosEcrire[i]);
     }
@@ -251,7 +259,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
     // revienne alors à 0. Il est donc tout à fait possible que posCouranteEcriture soit INFÉRIEUR à
     // posCouranteLecture, et vous devez gérer ce cas sans perdre de caractères et en respectant les
     // autres conditions (par exemple, ne jamais copier plus que len caractères).
-
+    int i, returnCopy;
     ssize_t bufferLen = 0;
     char bufferCopy[TAILLE_BUFFER];
 
@@ -259,14 +267,15 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
     bufferLen = (posCouranteLecture > posCouranteEcriture) ? TAILLE_BUFFER + posCouranteEcriture - posCouranteLecture : posCouranteEcriture - posCouranteLecture;
     bufferLen = (bufferLen > len) ? len : bufferLen;
 
-    for (int i=0; i < bufferLen; i++) {
-        int bufferCopy[i] = data[(posCouranteLecture + i) % TAILLE_BUFFER];
+    for (i=0; i < bufferLen; i++) {
+        bufferCopy[i] = data[(posCouranteLecture + i) % TAILLE_BUFFER];
     }
 
     posCouranteLecture = (posCouranteLecture + bufferLen) % TAILLE_BUFFER;
-    copy_to_user(buffer, bufferCopy, bufferLen);
+    returnCopy = copy_to_user(buffer, bufferCopy, bufferLen);
     mutex_unlock(&sync);
 
+    printk(" bufferLen %zd",bufferLen);
     return bufferLen;
 }
 
