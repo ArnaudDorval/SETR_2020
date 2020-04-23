@@ -65,7 +65,7 @@ static struct class*  setrClasse  = NULL;   // Contiendra les informations sur l
 static struct device* setrDevice = NULL;    // Contiendra les informations sur le périphérique associé
 
 static struct mutex sync;                   // Mutex servant à synchroniser les accès au buffer
-static atomic_t irqActif = ATOMIC_INIT(1);  // Pour déterminer si les interruptions doivent être traitées
+static atomic_t irqActif = ATOMIC_INIT(0);  // Pour déterminer si les interruptions doivent être traitées
 
 // 4 GPIO doivent être assignés pour l'écriture, et 4 en lecture (voir énoncé)
 // Nous vous proposons les choix suivants, mais ce n'est pas obligatoire
@@ -126,26 +126,40 @@ void func_tasklet_polling(unsigned long param){
     // 5) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
     // 6) Remettre toutes les lignes à 1 (pour réarmer l'interruption)
     // 7) Réactiver le traitement des interruptions
+    printk("in the tasklet");
+    do{
+        printk("queue %i", atomic_read(&irqActif));
+        
+        //le probleme est de la lgne 133 a 158 essais le pis tu vas comprendre
+        //pis essais le en d/commentant ligne 136 et 156 
+        for (ligneIdx = 0; ligneIdx < 4; ligneIdx++) {
+            //gpio_set_value(gpiosEcrire[ligneIdx], 1);
+            for (colIdx = 0; colIdx < 4; colIdx++) {
+                // 2) Pour chaque patron, vérifier la valeur des lignes d'entrée
+                gpioVal = gpio_get_value(gpiosLire[colIdx]);
+                
+                // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
+                if (gpioVal != dernierEtat[ligneIdx][colIdx] && gpioVal == 1) {
+                    printk(" val gpio %i", gpioVal);
+                    // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
+                    mutex_lock(&sync);
+                    data[posCouranteEcriture] = valeursClavier[ligneIdx][colIdx];
+                    //posCouranteEcriture = (posCouranteEcriture + 1) % TAILLE_BUFFER;
+                    posCouranteEcriture++;
+                    printk(" poscouranteecriture %i", posCouranteEcriture);
+                    if (posCouranteEcriture == TAILLE_BUFFER){
+                        posCouranteEcriture = 0;
+                    }
+                    mutex_unlock(&sync);
 
-    // 1) De passer au travers de tous les patrons de balayage
-    for (ligneIdx = 0; ligneIdx < 4; ligneIdx++) {
-      gpio_set_value(gpiosEcrire[ligneIdx], 1);
-      for (colIdx = 0; colIdx < 4; colIdx++) {
-        // 2) Pour chaque patron, vérifier la valeur des lignes d'entrée
-        gpioVal = gpio_get_value(gpiosLire[colIdx]);
-
-        // 3) Selon ces valeurs et le contenu de dernierEtat, déterminer si une nouvelle touche a été pressée
-        if (gpioVal != dernierEtat[ligneIdx][colIdx]) {
-          // 4) Mettre à jour le buffer et dernierEtat en vous assurant d'éviter les race conditions avec le reste du module
-          mutex_lock(&sync);
-          data[posCouranteEcriture] = valeursClavier[ligneIdx][colIdx];
-          posCouranteEcriture = (posCouranteEcriture + 1) % TAILLE_BUFFER;
-          mutex_unlock(&sync);
-          dernierEtat[ligneIdx][colIdx] = gpioVal;
+                }
+                dernierEtat[ligneIdx][colIdx] = gpioVal;
+            }
+            //gpio_set_value(gpiosEcrire[ligneIdx], 0);
         }
-      }
-      gpio_set_value(gpiosEcrire[ligneIdx], 0);
-    }
+        
+    }while(atomic_dec_return(&irqActif) > 0);
+    printk("apres reset atomic");
 
 }
 
@@ -163,7 +177,10 @@ static irq_handler_t  setr_irq_handler(unsigned int irq, void *dev_id, struct pt
     // Voyez les commentaires du tasklet pour une piste potentielle de synchronisation.
     // Le seul travail de cette IRQ est de céduler un tasklet qui fera le travail
     // TODO
-
+    printk(" dans interrupt");
+    atomic_inc(&irqActif);
+    tasklet_schedule(&tasklet_polling);
+    printk("interrupt handled");
     // On retourne en indiquant qu'on a géré l'interruption
     return (irq_handler_t) IRQ_HANDLED;
 }
@@ -213,11 +230,15 @@ static int __init setrclavier_init(void){
     // Attention, cette fonction devra être appelée 4 fois (une fois pour chaque GPIO)!
     //
     // Vous devez également initialiser le mutex de synchronisation.
-
-    for (int i=0; i<4; i++) {
+    for (i=0; i<4; i++) {
       gpio_request_one(gpiosLire[i], GPIOF_IN, gpiosLireNoms[i]);
-      gpio_request_one(gpiosEcrire[i], GPIOF_OUT_INIT_LOW, gpiosEcrireNoms[i]);
+      gpio_request_one(gpiosEcrire[i], GPIOF_OUT_INIT_HIGH, gpiosEcrireNoms[i]);
       gpio_set_debounce(gpiosLire[i], dureeDebounce);
+    }
+    
+    mutex_init(&sync);
+
+    for (i=0; i<4; i++) {
 
       irqId[i] = gpio_to_irq(gpiosLire[i]);
 
@@ -230,7 +251,7 @@ static int __init setrclavier_init(void){
         if(ok != 0)
             printk(KERN_ALERT "Erreur (%d) lors de l'enregistrement IRQ #{%d}!\n", ok, irqId[i]);
     }
-    mutex_init(&sync);
+    
     printk(KERN_INFO "SETR_CLAVIER : Fin de l'Initialisation!\n"); // Made it! device was initialized
 
     return 0;
@@ -243,12 +264,15 @@ static void __exit setrclavier_exit(void){
     // Vous aurez pour cela besoin de la fonction gpio_free
     // Vous devrez également relâcher les interruptions qui ont été
     // précédemment enregistrées. Utilisez free_irq(irqno, NULL)
-    for (int i=0; i<4; i++) {
+    int i;
+    for (i=0; i<4; i++) {
         gpio_free(gpiosLire[i]);
         gpio_free(gpiosEcrire[i]);
+
+    }
+    for (i=0; i<4; i++) {
         free_irq(irqId[i], NULL);
     }
-
     // On retire correctement les différentes composantes du pilote
     device_destroy(setrClasse, MKDEV(majorNumber, 0));
     class_unregister(setrClasse);
@@ -291,21 +315,23 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
     // posCouranteLecture, et vous devez gérer ce cas sans perdre de caractères et en respectant les
     // autres conditions (par exemple, ne jamais copier plus que len caractères).
 
+    int i, returncpy;
     ssize_t bufferLen = 0;
     char bufferCopy[TAILLE_BUFFER];
 
+    printk("icitte calisse");
     mutex_lock(&sync);
     bufferLen = (posCouranteLecture > posCouranteEcriture) ? TAILLE_BUFFER + posCouranteEcriture - posCouranteLecture : posCouranteEcriture - posCouranteLecture;
     bufferLen = (bufferLen > len) ? len : bufferLen;
 
-    for (int i=0; i < bufferLen; i++) {
-        int bufferCopy[i] = data[(posCouranteLecture + i) % TAILLE_BUFFER];
+    for (i=0; i < bufferLen; i++) {
+        bufferCopy[i] = data[(posCouranteLecture + i) % TAILLE_BUFFER];
     }
 
     posCouranteLecture = (posCouranteLecture + bufferLen) % TAILLE_BUFFER;
-    copy_to_user(buffer, bufferCopy, bufferLen);
+    returncpy = copy_to_user(buffer, bufferCopy, bufferLen);
     mutex_unlock(&sync);
-
+    printk(" bufferLen %zd",bufferLen);
     return bufferLen;
 }
 
