@@ -64,7 +64,7 @@ void setScheduling(int schedType, char *schedArgs)
             schedAttr.sched_priority = 99;
         break;
         case SCHED_FIFO:
-            schedAttr.sched_priority = sched_get_priority_min(SCHED_FIFO);
+            schedAttr.sched_priority = sched_get_priority_max(SCHED_FIFO);
             break;
         case SCHED_DEADLINE:
             if (schedArgs[0] != 0)

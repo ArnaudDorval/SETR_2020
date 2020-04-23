@@ -74,14 +74,6 @@ static int  gpiosLire[] = {12, 16, 20, 21};             // Correspond aux pins 3
 static char* gpiosEcrireNoms[] = {"OUT1", "OUT2", "OUT3", "OUT4"};
 static char* gpiosLireNoms[] = {"IN1", "IN2", "IN3", "IN4"};
 
-// Les patrons de balayage (une seule ligne doit être active à la fois)
-static int   patterns[4][4] = {
-    {1, 0, 0, 0},
-    {0, 1, 0, 0},
-    {0, 0, 1, 0},
-    {0, 0, 0, 1}
-};
-
 // Les valeurs du clavier, selon la ligne et la colonne actives
 static char valeursClavier[4][4] = {
     {'1', '2', '3', 'A'},
@@ -108,7 +100,7 @@ static int dureeDebounce = 200;
 
 static int pollClavier(void *arg){
     // Cette fonction contient la boucle principale du thread détectant une pression sur une touche
-    int patternIdx, ligneIdx, colIdx, gpioVal;
+    int ligneIdx, colIdx, gpioVal;
     printk(KERN_INFO "SETR_CLAVIER : Poll clavier declenche! \n");
     while(!kthread_should_stop()){           // Permet de s'arrêter en douceur lorsque kthread_stop() sera appelé
       set_current_state(TASK_RUNNING);      // On indique qu'on est en train de faire quelque chose
@@ -156,7 +148,7 @@ static int pollClavier(void *arg){
 
 
 static int __init setrclavier_init(void){
-    int i, ok;
+    int i;
     printk(KERN_INFO "SETR_CLAVIER : Initialisation du driver commencee\n");
 
     // On enregistre notre pilote

@@ -77,14 +77,6 @@ static char* gpiosLireNoms[] = {"IN1", "IN2", "IN3", "IN4"};
 
 static unsigned int irqId[4];               // Contient les numéros d'interruption pour chaque broche de lecture
 
-// Les patrons de balayage (une seule ligne doit être active à la fois)
-static int   patterns[4][4] = {
-    {1, 0, 0, 0},
-    {0, 1, 0, 0},
-    {0, 0, 1, 0},
-    {0, 0, 0, 1}
-};
-
 // Les valeurs du clavier, selon la ligne et la colonne actives
 static char valeursClavier[4][4] = {
     {'1', '2', '3', 'A'},
@@ -111,7 +103,7 @@ void func_tasklet_polling(unsigned long param){
     // touche est pressée.
     // Une différence majeure est que ce tasklet ne contient pas de boucle,
     // il ne s'exécute qu'une seule fois par interruption!
-    int patternIdx, ligneIdx, colIdx, gpioVal, i;
+    int ligneIdx, colIdx, gpioVal, i;
 
     // TODO
     // Écrivez le code permettant
